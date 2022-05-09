@@ -1,2 +1,2 @@
-include src/demo_package_and_read_data_files/sample_data_pi.txt
-include src/demo_package_and_read_data_files/sample_data/sample_data_e.txt
+include src/demo_package_sample_data_with_code/sample_data_pi.txt
+graft src/demo_package_sample_data_with_code/sample_data
