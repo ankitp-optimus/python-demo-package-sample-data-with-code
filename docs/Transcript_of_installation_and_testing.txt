@@ -1,0 +1,141 @@
+# cd into development directory
+ada@HyperPortabella demo-package-sample-data-with-code % pwd
+/Volumes/Avocado/Users/ada/Documents/GitHub_repos/demo-package-sample-data-with-code
+
+# create virtual environment in development directory and activate it
+ada@HyperPortabella demo-package-sample-data-with-code % python3 -m venv venv
+ada@HyperPortabella demo-package-sample-data-with-code % source venv/bin/activate
+
+# upgrade pip within virtual environment
+(venv) ada@HyperPortabella demo-package-sample-data-with-code % python -m pip install --upgrade pip
+Requirement already satisfied: pip in ./venv/lib/python3.9/site-packages (22.0.4)
+
+# pip list shows that only pip and setuptools are loaded into virtual environment
+(venv) ada@HyperPortabella demo-package-sample-data-with-code % pip list
+Package    Version
+---------- -------
+pip        22.0.4
+setuptools 60.10.0
+
+# LOCAL install for development purpoases
+# install the package contained in the current directory (“.”) in “editable/development mode”
+(venv) ada@HyperPortabella demo-package-sample-data-with-code % pip install -e .
+Obtaining file:///Volumes/Avocado/Users/ada/Documents/GitHub_repos/demo-package-sample-data-with-code
+  Installing build dependencies ... done
+  Checking if build backend supports build_editable ... done
+  Getting requirements to build wheel ... done
+  Preparing metadata (pyproject.toml) ... done
+Installing collected packages: demo-package-sample-data-with-code
+  Running setup.py develop for demo-package-sample-data-with-code
+Successfully installed demo-package-sample-data-with-code-0.0.1
+
+# Use pip list to confirm that our package is now loaded
+(venv) ada@HyperPortabella demo-package-sample-data-with-code % pip list
+Package                            Version Editable project location
+---------------------------------- ------- ----------------------------------------------------------------------------------------
+demo-package-sample-data-with-code 0.0.1   /Volumes/Avocado/Users/ada/Documents/GitHub_repos/demo-package-sample-data-with-code/src
+pip                                22.0.4
+setuptools                         60.10.0
+
+# Test the package by invoking it with python -m
+(venv) ada@HyperPortabella demo-package-sample-data-with-code % python -m demo_package_sample_data_with_code
+I am here, in __main__.py.
+
+# # # # # # # # # # # # # # # 
+
+π: 3.14159265358979323846
+e: 2.71828182845904523536
+
+Oops! The data file «meaning_of_life.txt» wasn’t found at this location:
+»» /Volumes/Avocado/Users/ada/Documents/GitHub_repos/demo-package-sample-data-with-code/src/demo_package_sample_data_with_code/sample_data/meaning_of_life.txt.
+[Errno 2] No such file or directory: '/Volumes/Avocado/Users/ada/Documents/GitHub_repos/demo-package-sample-data-with-code/src/demo_package_sample_data_with_code/sample_data/meaning_of_life.txt'
+Meaning of life: I have no clue 🤪
+
+* * * * * * * * * * * * * * * 
+
+# The above was the expected/desired/correct output (including the “Oops!”, which was a deliberate exception).
+
+# Prepare for PyPI
+# Install `build` into virtual environment
+
+(venv) ada@HyperPortabella demo-package-sample-data-with-code % python -m pip install --upgrade build
+Successfully installed build-0.7.0 packaging-21.3 pep517-0.12.0 pyparsing-3.0.8 tomli-2.0.1
+
+# Build the package to be uploaded to PyPI
+
+(venv) ada@HyperPortabella demo-package-sample-data-with-code % python -m build
+
+# NOTE: If your MANIFEST.in file isn’t correct, you might be asking for sample-data files that can’t be found.
+# So be on the lookout for the following kind of warnings in the output to “% python -m build”:
+
+warning: no files found matching 'src/demo_package_and_read_data_files/sample_data_pi.txt'
+warning: no files found matching 'src/demo_package_and_read_data_files/sample_data/sample_data_e.txt'
+
+(venv) ada@HyperPortabella demo-package-sample-data-with-code % python -m build
+…
+
+Successfully built demo-package-sample-data-with-code-0.0.1.tar.gz and demo_package_sample_data_with_code-0.0.1-py39-none-any.whl
+
+# Install twine in virtual environment
+
+(venv) ada@HyperPortabella demo-package-sample-data-with-code % python -m pip install --upgrade twine
+
+# Upload the distribution packages in dist/ to TestPyPI using twine
+
+(venv) ada@HyperPortabella demo-package-sample-data-with-code % python -m twine upload --repository testpypi dist/*
+Uploading distributions to https://test.pypi.org/legacy/
+Enter your username: jimratliff
+Enter your password: 
+Uploading demo_package_sample_data_with_code-0.0.1-py39-none-any.whl
+100% ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 52.6/52.6 kB • 00:00 • 51.6 MB/s
+Uploading demo-package-sample-data-with-code-0.0.1.tar.gz
+100% ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 71.3/71.3 kB • 00:00 • 34.1 MB/s
+
+View at:
+https://test.pypi.org/project/demo-package-sample-data-with-code/0.0.1/
+
+# Create new directory in which to test the TestPyPI package.
+
+# Deactivate the previous virtual environment
+
+# Enter the new test-bed directory
+ada@HyperPortabella GitHub_repos % cd test_bed_demo-package-sample-data-with-code 
+
+#Create new virtual environment 
+ada@HyperPortabella test_bed_demo-package-sample-data-with-code % python3 -m venv venv
+ada@HyperPortabella test_bed_demo-package-sample-data-with-code % source venv/bin/activate
+(venv) ada@HyperPortabella test_bed_demo-package-sample-data-with-code % python -m pip install --upgrade pip
+Requirement already satisfied: pip in ./venv/lib/python3.9/site-packages (22.0.4)
+
+# Install project from TestPyPI using link provided on project homepage
+(venv) ada@HyperPortabella test_bed_demo-package-sample-data-with-code % pip install -i https://test.pypi.org/simple/ demo-package-sample-data-with-code==0.0.1
+Looking in indexes: https://test.pypi.org/simple/
+Collecting demo-package-sample-data-with-code==0.0.1
+  Downloading https://test-files.pythonhosted.org/packages/cd/e5/64f8bf11bd122d02f253ee65e348590a84414995a86a82ddc39d9fbfdcb3/demo_package_sample_data_with_code-0.0.1-py39-none-any.whl (17 kB)
+Installing collected packages: demo-package-sample-data-with-code
+Successfully installed demo-package-sample-data-with-code-0.0.1
+
+# Confirm it's installed
+(venv) ada@HyperPortabella test_bed_demo-package-sample-data-with-code % pip list
+Package                            Version
+---------------------------------- -------
+demo-package-sample-data-with-code 0.0.1
+pip                                22.0.4
+setuptools                         60.10.0
+
+# Test the package by invoking it with python -m
+
+(venv) ada@HyperPortabella test_bed_demo-package-sample-data-with-code % python -m demo_package_sample_data_with_code
+I am here, in __main__.py.
+
+# # # # # # # # # # # # # # # 
+
+π: 3.14159265358979323846
+e: 2.71828182845904523536
+
+Oops! The data file «meaning_of_life.txt» wasn’t found at this location:
+»» /Volumes/Avocado/Users/ada/Documents/GitHub_repos/test_bed_demo-package-sample-data-with-code/venv/lib/python3.9/site-packages/demo_package_sample_data_with_code/sample_data/meaning_of_life.txt.
+[Errno 2] No such file or directory: '/Volumes/Avocado/Users/ada/Documents/GitHub_repos/test_bed_demo-package-sample-data-with-code/venv/lib/python3.9/site-packages/demo_package_sample_data_with_code/sample_data/meaning_of_life.txt'
+Meaning of life: I have no clue 🤪
+
+* * * * * * * * * * * * * * * 
