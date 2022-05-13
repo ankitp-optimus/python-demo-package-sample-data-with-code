@@ -88,7 +88,7 @@ GitHub » kiwidamien. See especially
 “[Making a Python Package VI: including data files](https://kiwidamien.github.io/making-a-python-package.html).”
 
 If the advent of `importlib.resources` in Python 3.7 weren’t enough, an additional function, viz., `files()`, was added
-in Python 3.9. I rely upon the `files()` function in this package, and for that reason this package requires
+in Python 3.9. I rely upon the `files()` function in this package, and for that reason this package requires
 Python 3.9.
 
 # `importlib.resources`: Selected basics
