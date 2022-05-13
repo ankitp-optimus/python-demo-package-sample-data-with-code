@@ -26,14 +26,6 @@ on a Mac (macOS 12.3.1). All citations/quotations to documentation and other so
 For my use of “project” and “package” (including “import package” and “distribution package”) see Jim Ratliff,
 “[Unpacking ‘package’ terminology in Python](https://gist.github.com/jimratliff/fc799e74e8104e6b05e6894ce8555144),” GitHub Gist.
 
-The PyPI project name is derived from the developer-specified `name` field in `setup.cfg` or `setup.py`. Note that, when
-the project name is formed by two or more separate words joined by a delimiter, PyPI will “normalize” the project name
-such that the words are joined by a hyphen (`-`) regardless of what the original delimiter was (in particular,
-underscores (`_`) are common). As far as I know, the developer-specified `name` field in `setup.cfg` or `setup.py` has 
-no other significance. So, to avoid confusion, I suggest that, when the project name has two or more words joined by
-delimiters, the developer specify hyphens for the delimiter from the get go, since that’s the form it will 
-ultimately take.
-
 ## Resources for topics not well covered here
 I will not go into a detailed explanation of many aspects of packaging more generally that are well covered
 elsewhere, e.g., the `LICENSE`,  `README`, `pyproject.toml`, and `setup.cfg` files (or why I’m
@@ -101,6 +93,8 @@ If the advent of `importlib.resources` in Python 3.7 weren’t enough, an addit
 in Python 3.9. I rely upon the `files()` function in this package, and for that reason this package requires
 Python 3.9.
 
+## Road map for the remainder of this README document
+
 # `importlib.resources`: Selected basics
 ## Background
 [`importlib`](https://docs.python.org/3/library/importlib.html), a Python built-in library, appeared in Python 3.1 and
@@ -153,14 +147,15 @@ To read the text into a variable:
 ```text_in_file = my_resource_location_as_string.read_text()```
 
 # This project
-## File and directory structure
-This project has the following directory/file structure:
+## File and directory structure; rationale for `src/` directory
+This project has the following initial directory/file structure:
 ```
 ├── LICENSE
 ├── MANIFEST.in
 ├── README.md
 ├── pyproject.toml
 ├── setup.cfg
+├── docs
 ├── src
 │   ├── demo_package_and_read_data_files
 │   │   ├── __init__.py
@@ -171,11 +166,115 @@ This project has the following directory/file structure:
 │   │   │   ├── __init__.py
 │   │   │   └── sample_data_e.txt
 │   │   └── sample_data_pi.txt
+└── tests
 ```
+By “initial directory/file structure,” I acknowledge that additional directories will be generated as a result of
+(a) creating a virtual environment, which adds a `venv/` directory, (b) installing the project in an
+“editable”/“development” mode, which adds a `src/demo_package_sample_data_with_code.egg-info` directory, and
+(c) the `build` process, which adds a `dist/` directory. 
+
+Note the presence of the `src/` directory at the root level of the project directory and which contains the import 
+package `demo_package_and_read_data_files`. This structure—the presence of this `src/` directory—is certainly not yet a
+standard but is gaining mindshare. I won’t attempt to justify it myself here, but instead I’ll point you to the
+following resources:
+* § “[A simple project](https://packaging.python.org/en/latest/tutorials/packaging-projects/#a-simple-project)” in
+PyPA’s tutorial “[Packaging Python Projects](https://packaging.python.org/en/latest/tutorials/packaging-projects)”
+* § “[The structure](https://blog.ionelmc.ro/2014/05/25/python-packaging/#the-structure)” in Ionel Cristian Mărieș,
+“[Packaging a python library](https://blog.ionelmc.ro/2014/05/25/python-packaging),” ionel’s codelog, September 30, 2019.
+* Mark Smith’s presentation at EuroPython 2019: “Publishing (Perfect) Python Packages on PyPi”
+([YouTube](https://www.youtube.com/watch?v=GIF3LaRqgXo),
+[GitHub](https://github.com/judy2k/publishing_python_packages_talk)), at 26:00:
+> Here’s why we use the `src/` directory. Our root directory is the directory we've been working in. If our code was in
+this directory—if we import `helloworld` while running the tests—it would run the code in our current directory. But we
+don’t want it to do that. We want it to test installing the package and using the code from there. By having the `src/`
+directory, you’re forcing it to use the version you’ve just installed into the versioned environment.
+
 
 ## Noncomprehensive comments on selected elements of project metadata
 Without going generally in how to prepare the various metadata files, here I highlight particular ways in which
 particular files must be changed or created so that our data files will be properly packaged.
+
+### The directory that immediately encloses each resource must be a package and thus must have an `__init__.py` file
+`importlib.resources` considers a file a resource only if the file is in the root directory of a package. A directory
+cannot be a package unless it includes a `__init__.py` file. (It’s fine if this `__init__.py` file is empty. It’s its
+filename that counts.)
+
+Here the relevant resources are two text files:
+* "sample_data_pi.txt"
+    * located at the root of the package, i.e.,
+    * demo_package_and_read_data_files/sample_data_pi.txt
+* "sample_data_e.txt"
+    * located within a subfolder, "sample_data", of the package, i.e.,
+    * demo_package_and_read_data_files/sample_data/sample_data_e.txt
+
+(Soley to demonstrate throwing a FileNotFoundError exception, `example.py` also attempts to open `meaning_of_life.txt`,
+but, unsurprisingly, it does not exist.)
+
+In our case the requirement that each data file be in the root directory of a package  means that the following
+directories each must have an `__init__.py` file:
+*  `path/to/src/demo_package_and_read_data_files`
+    * This directory would have been a package (and thus would have had an `__init__.py` file) even if we had no data
+    files to worry about, so no additional `__init__.py` file is created for this directory on account of the data
+    files.
+*  `path/to/src/demo_package_and_read_data_files/sample_data`
+    * This directory is *not* a directory of Python files, so it would not normally have an `__init__.py` file. Thus,
+    in order to read the data file from inside, we need to “artificially” add an `__init__.py` file inside.
+### Telling `setuptools` about data files that need to be included in the package
+`setuptools` will not by default incorporate arbitrary non-Python text files into the package when it builds it. Thus,
+you must tell `setuptools` which such files you want it to include.
+
+In the methodology I use here, this requires:
+* telling the configuration file `setup.cfg` that you *do* have such files to be included, but not there saying which
+ones
+* creating a `MANIFEST.in` file that specifies the data files (including their paths) to be included.
+
+(If you’re using a different methodology, like using `setup.py` rather than `setup.cfg`, see the corresponding
+discussion at § [Data File Support](https://setuptools.pypa.io/en/latest/userguide/datafiles.html#) of the
+[Setuptools User Guide](https://setuptools.pypa.io/en/latest/userguide/index.html).)
+
+#### `setup.cfg`: `include_package_data`
+In the configuration file `setup.cfg`, in its `[options]` section, specify:
+`include_package_data = True`
+#### Create `MANIFEST.in` and itemize the data files
+In the present case, the `MANIFEST.in` file contains the following and only the following:
+```
+include src/demo_package_and_read_data_files/sample_data_pi.txt
+include src/demo_package_and_read_data_files/sample_data/sample_data_e.txt
+```
+See, generally:
+§ “[Including files in source distributions with `MANIFEST.in`](https://packaging.python.org/en/latest/guides/using-manifest-in/#)”
+of “[Python Packaging User Guide](https://packaging.python.org/en/latest/).”
+
+### `setup.cfg`: Add a `python-tag` tag to force file name of resulting “wheel” distribution file to reflect partticular minimum version of Python
+This discussion will make more sense after you get to later section § “[The wheel file](#the-wheel-file),” but this discussion
+nevertheless logically belongs here.
+
+This package requires Python 3.9. My `setup.cfg` file originally contained the following excerpt:
+```
+classifiers =
+    Programming Language :: Python :: 3.9
+    License :: OSI Approved :: MIT License
+    Operating System :: OS Independent
+
+[options]
+package_dir =
+    = src
+packages = find:
+python_requires = >=3.9
+include_package_data = True
+```
+However, notwithstanding the `python_requires = >=3.9`, the resulting wheel file’s filename contained a “Python Tag” 
+that was simply `py3` rather than `py39` (which would have indicated a minimum Python version of 3.9).
+
+So I next changed the `Python` tag in the `Classifiers` section to explicitly state version 3.9. However, that did not
+affect the Python Tag in the file name of the resulting wheel file.
+
+I finally—inspired by [this answer on Stack Overflow](https://stackoverflow.com/a/52613394/8401379)—solved the problem by adding the following section to `setup.cfg`:
+```
+[bdist_wheel]
+python-tag = py39
+```
+After this change, the file name of the resulting wheel file including the Python Tag string `py39` as I desired.
 
 ### Considerations regarding the inter-word separate character in a multiword package name
 Now I address issues that can arrive when you want the project name to have multiple words (rather than one continuous
@@ -188,7 +287,16 @@ as part of URLs, filenames, command line parameters and must also interoperate w
 permitted characters are constrained to: • ASCII letters ([a-zA-Z]) • ASCII digits ([0-9]) • underscores (_) • hyphens
 • (-) periods (.). Distribution names MUST start and end with an ASCII letter or digit. … All comparisons of
 distribution names MUST be case insensitive, and MUST consider hyphens and underscores to be equivalent.” There is also
-discussion of “confusable” characters.”)  
+discussion of “confusable” characters.”) 
+
+The PyPI project name is derived from the developer-specified `name` field in `setup.cfg` or `setup.py`. Note that, when
+the project name is formed by two or more separate words joined by a delimiter, PyPI will
+“[normalize](https://peps.python.org/pep-0503/#normalized-names)” the project name
+such that the words are joined by a hyphen (`-`) regardless of what the original delimiter was (in particular,
+underscores (`_`) are common). As far as I know, the developer-specified `name` field in `setup.cfg` or `setup.py` has 
+no other significance. So, to avoid confusion, I suggest that, when the project name has two or more words joined by
+delimiters, the developer specify hyphens for the delimiter from the get go, since that’s the form it will 
+ultimately take.
 
 In an early iteration, I consistently used the same name (`demo_package_and_read_data_files`) for (a) the directory
 immediately contained by `src/` and (b) the package/project name declared to PyPI in `setup.cfg`. (I also used the same
@@ -247,87 +355,7 @@ displays for the project.
 
 
 
-### The directory that immediately encloses each resource must be a package and thus must have an `__init__.py` file
-`importlib.resources` considers a file a resource only if the file is in the root directory of a package. A directory
-cannot be a package unless it includes a `__init__.py` file. (It’s fine if this `__init__.py` file is empty. It’s its
-filename that counts.)
 
-Here the relevant resources are two text files:
-* "sample_data_pi.txt"
-    * located at the root of the package, i.e.,
-    * demo_package_and_read_data_files/sample_data_pi.txt
-* "sample_data_e.txt"
-    * located within a subfolder, "sample_data", of the package, i.e.,
-    * demo_package_and_read_data_files/sample_data/sample_data_e.txt
-
-(Soley to demonstrate throwing a FileNotFoundError exception, `example.py` also attempts to open `meaning_of_life.txt`,
-but, unsurprisingly, it does not exist.)
-
-In our case the requirement that each data file be in the root directory of a package  means that the following
-directories each must have an `__init__.py` file:
-*  `path/to/src/demo_package_and_read_data_files`
-    * This directory would have been a package (and thus would have had an `__init__.py` file) even if we had no data
-    files to worry about, so no additional `__init__.py` file is created for this directory on account of the data
-    files.
-*  `path/to/src/demo_package_and_read_data_files/sample_data`
-    * This directory is *not* a directory of Python files, so it would not normally have an `__init__.py` file. Thus,
-    in order to read the data file from inside, we need to “artificially” add an `__init__.py` file inside.
-### Telling `setuptools` about data files that need to be included in the package
-`setuptools` will not by default incorporate arbitrary non-Python text files into the package when it builds it. Thus,
-you must tell `setuptools` which such files you want it to include.
-
-In the methodology I use here, this requires:
-* telling the configuration file `setup.cfg` that you *do* have such files to be included, but not there saying which
-ones
-* creating a `MANIFEST.in` file that itemizes the data files (including their paths) to be included.
-
-(If you’re using a different methodology, like using `setup.py` rather than `setup.cfg`, see the corresponding
-discussion at § [Data File Support](https://setuptools.pypa.io/en/latest/userguide/datafiles.html#) of the
-[Setuptools User Guide](https://setuptools.pypa.io/en/latest/userguide/index.html).)
-
-#### `setup.cfg`: `include_package_data`
-In the configuration file `setup.cfg`, in its `[options]` section, specify:
-`include_package_data = True`
-#### Create `MANIFEST.in` and itemize the data files
-In the present case, the `MANIFEST.in` file contains the following and only the following:
-```
-include src/demo_package_and_read_data_files/sample_data_pi.txt
-include src/demo_package_and_read_data_files/sample_data/sample_data_e.txt
-```
-See, generally:
-§ “[Including files in source distributions with `MANIFEST.in`](https://packaging.python.org/en/latest/guides/using-manifest-in/#)”
-of “[Python Packaging User Guide](https://packaging.python.org/en/latest/).”
-
-### `setup.cfg`: Add a `python-tag` tag to force file name of resulting “wheel” distribution file to reflect partticular minimum version of Python
-This discussion will make more sense after you get to later section § “[The wheel file](#the-wheel-file),” but this discussion
-nevertheless logically belongs here.
-
-This package requires Python 3.9. My `setup.cfg` file originally contained the following excerpt:
-```
-classifiers =
-    Programming Language :: Python :: 3.9
-    License :: OSI Approved :: MIT License
-    Operating System :: OS Independent
-
-[options]
-package_dir =
-    = src
-packages = find:
-python_requires = >=3.9
-include_package_data = True
-```
-However, notwithstanding the `python_requires = >=3.9`, the resulting wheel file’s filename contained a “Python Tag” 
-that was simply `py3` rather than `py39` (which would have indicated a minimum Python version of 3.9).
-
-So I next changed the `Python` tag in the `Classifiers` section to explicitly state version 3.9. However, that did not
-affect the Python Tag in the file name of the resulting wheel file.
-
-I finally—inspired by [this answer on Stack Overflow](https://stackoverflow.com/a/52613394/8401379)—solved the problem by adding the following section to `setup.cfg`:
-```
-[bdist_wheel]
-python-tag = py39
-```
-After this change, the file name of the resulting wheel file including the Python Tag string `py39` as I desired.
 
 ### `__main__.py` is executed when package invoked from command line with `-m` flag; allows for a CLI
 Although not appropriate in all cases, including a `__main__.py` file establishes an entry point for the case where
@@ -359,7 +387,7 @@ From here on, I’m assuming that you’re using a virtual environment. I use
 “If you are using Python 3.3 or newer, the venv module is the preferred way to create and manage virtual environments.”
 
 Generally, see:
-* [12. Virtual Environments and Packages](https://docs.python.org/3/tutorial/venv.html) of Python Docs.
+* [§ 12. Virtual Environments and Packages](https://docs.python.org/3/tutorial/venv.html) of Python Docs.
 * Brett Cannon, “[A quick-and-dirty guide on how to install packages for Python](https://snarky.ca/a-quick-and-dirty-guide-on-how-to-install-packages-for-python/),” *Tall, Snarky Canadian*, January 21, 2020. Though not
 signaled by its title, there is substantial discussion of the why and how of using a virtual environment.
 
