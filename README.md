@@ -1,19 +1,19 @@
 # Introduction
 ## Goals of this project
-This package doesn’t do anything useful. It exists only as a vehicle to demonstrate
+This package doesn’t do anything useful. It exists only as a vehicle to demonstrate:
 *  how to prepare a Python project that can be uploaded to the
 [Python Package Index (PyPI)](https://pypi.org/) as a release, from which it can then be installed on user systems using the
 [pip](https://pypi.org/project/pip/) package installer
-* use of a `src/` directory intermediate between the project directory and the outermost package directory
 *  how static text files (for example, templates, sample data, etc.) can be packaged and then—using
 `importlib.resources`—referenced and read from their host package or any other package, even if these files don’t
 actually reside on the file system (e.g., if they reside in a .zip archive). This is relevant because:
     * [“[T]he PyPA recommends that any data files you wish to be accessible at run time be included **inside the package**.”](https://setuptools.pypa.io/en/latest/userguide/datafiles.html#non-package-data-files)
     * [PEP 302](https://peps.python.org/pep-0302/) added hooks to import from .zip files and Python Eggs.
+* use of a `src/` directory intermediate between the project directory and the outermost package directory with multiple benefits
 *  how to install the project in “editable”/“development” mode during development so that you can test the
 functionalities that access resources in packages—without having to rebuild and reinstall the package after every change.
 * how to use a `__main__.py` file as an entry point to the package, which will execute when the *package* is invoked on
-the command line with the `-m` flag.
+the command line with the `-m` flag (as opposed to executing the module).
 * how to tell the `build` mechanism to identify a specific version of Python, e.g., `py39`, in the “Python Tag” in
 the file name of the resulting “wheel” (`.whl`) distribution file, so that users will be better informed of the
 Python-version requirement before attempting to install the package.
@@ -244,22 +244,27 @@ discussion at § [Data File Support](https://setuptools.pypa.io/en/latest/userg
 In the configuration file `setup.cfg`, in its `[options]` section, specify:
 `include_package_data = True`
 #### Create `MANIFEST.in` and itemize the data files
+See, generally:
+§ “[Including files in source distributions with `MANIFEST.in`](https://packaging.python.org/en/latest/guides/using-manifest-in/#)”
+of “[Python Packaging User Guide](https://packaging.python.org/en/latest/).” 
+
 In the present case, the `MANIFEST.in` file contains the following and only the following:
 ```
 include src/demo_package_sample_data_with_code/sample_data_pi.txt
 graft src/demo_package_sample_data_with_code/sample_data
 ```
+where `graft` ensures, without itemizing them, that all data files in `/sample_data` are included. (See
+§ [`MANIFEST.in` commands](https://packaging.python.org/en/latest/guides/using-manifest-in/#manifest-in-commands) in the
+Python Packaging User Guide.)
+
 Thanks to the structure adopted here, where the `src/` directory separates all the project metadata from the project
 code/data, the  `MANIFEST.in` perhaps could be made even simpler:
 ```
 graft src
 ```
 which would ensure that all files within `src/` are included in the distribution.
-([See](https://blog.ionelmc.ro/2014/05/25/python-packaging/#the-structure): “Without `src` writting a `MANIFEST.in` is tricky. … It’s much easier with a `src` directory: just add `graft src` in `MANIFEST.in`.)
+(See [Ionel Cristian Mărieș](https://blog.ionelmc.ro/2014/05/25/python-packaging/#the-structure): “Without `src` writting a `MANIFEST.in` is tricky. … It’s much easier with a `src` directory: just add `graft src` in `MANIFEST.in`.)
 
-See, generally:
-§ “[Including files in source distributions with `MANIFEST.in`](https://packaging.python.org/en/latest/guides/using-manifest-in/#)”
-of “[Python Packaging User Guide](https://packaging.python.org/en/latest/).” 
 
 ### `setup.cfg`: Add a `python-tag` tag to force file name of resulting “wheel” distribution file to reflect partticular minimum version of Python
 This discussion will make more sense after you get to later section § “[The wheel file](#the-wheel-file),” but this discussion
