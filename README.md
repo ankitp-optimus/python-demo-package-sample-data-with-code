@@ -95,6 +95,11 @@ Python 3.9.
 
 ## Road map for the remainder of this README document
 
+* [`importlib.resources`: Selected basics](#importlibresources-selected-basics)
+* [File and directory structure]()
+* [Noncomprehensive comments on selected elements of project metadata](#noncomprehensive-comments-on-selected-elements-of-project-metadata)
+* [Finish development and upload to PyPI](#finish-development-and-upload-to-pypi)
+
 # `importlib.resources`: Selected basics
 ## Background
 [`importlib`](https://docs.python.org/3/library/importlib.html), a Python built-in library, appeared in Python 3.1 and
