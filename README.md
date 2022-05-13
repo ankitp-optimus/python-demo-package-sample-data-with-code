@@ -112,7 +112,7 @@ actually refers readers to the
 standalone backport of `importlib.resources` for earlier versions of Python, for more information on using
 `importlib.resources`.)
 ## The `files()` function
-This package calls the
+This demo package calls the
 [function `importlib.resources.files(`*`package`*`)`](https://docs.python.org/3/library/importlib.html#importlib.resources.files),
 where *`package`* can be either a name or a module object that conforms to the `Package` requirements.The function
 returns an instance of abstract base class `importlib.abc.Traversable`. This object has available a subset of
@@ -127,7 +127,8 @@ returns an instance of abstract base class `importlib.abc.Traversable`. This obj
 * `read_bytes()`
 * `read_text(`*encoding=None*`)`
 
-You can specify a resource from (a) the name of the package immediately enclosing the resource and (b) the resource  by either:
+You can specify the location of a resource from (a) the name of the package immediately enclosing the resource and
+(b) the name of the resource  by either:
 
 ```my_resource_location_as_string = importlib.resources.files('mypackage').joinpath('resource_name')```
 
@@ -135,15 +136,15 @@ or
 
 ```my_resource_location_as_string = importlib.resources.files('mypackage') / 'resource_name'```
 
-where the latter corresponds to `__truediv__(`*child*`)`.
+where the latter corresponds to `__truediv__(`*child*`)` method.
 
 To read the text into a variable:
 
 ```text_in_file = my_resource_location_as_string.read_text()```
 
-# This package
+# This project
 ## File and directory structure
-This package has the following directory/file structure:
+This project has the following directory/file structure:
 ```
 ├── LICENSE
 ├── MANIFEST.in
