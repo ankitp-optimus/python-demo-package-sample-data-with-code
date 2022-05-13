@@ -1,15 +1,15 @@
 # Introduction
 ## Goals of this project
 This package doesn’t do anything useful. It exists only as a vehicle to demonstrate
-*  how to create a Python package that can be uploaded to the
-[Python Package Index (PyPI)](https://pypi.org/), from which it can then be installed on user systems using the
+*  how to prepare a Python project that can be uploaded to the
+[Python Package Index (PyPI)](https://pypi.org/) as a release, from which it can then be installed on user systems using the
 [pip](https://pypi.org/project/pip/) package installer
 *  how static text files (for example, templates, sample data, etc.) can be packaged and then
 referenced and read from their host package or any other package, even if these files don’t actually reside on the file
 system (e.g., if they reside in a .zip archive). This is relevant because:
     * [“[T]he PyPA recommends that any data files you wish to be accessible at run time be included **inside the package**.”](https://setuptools.pypa.io/en/latest/userguide/datafiles.html#non-package-data-files)
     * [PEP 302](https://peps.python.org/pep-0302/) added hooks to import from .zip files and Python Eggs.
-*  how to install the package in “editable”/“development” mode during development so that you can test the
+*  how to install the project in “editable”/“development” mode during development so that you can test the
 functionalities that access resources in packages—without having to rebuild and reinstall the package after every change.
 * how to use a `__main__.py` file as an entry point to the package, which will execute when the *package* is invoked on
 the command line with the `-m` flag.
@@ -22,21 +22,8 @@ Python-version requirement before attempting to install the package.
 on a Mac (macOS 12.3.1). All citations/quotations to documentation and other sources were valid as of May 1, 2022.
 
 ## Terminology
-A brief note on [terminology as used on PyPI](https://pypi.org/help/#packages):
-* “project”: the name of a collection of releases and files, and information about them. Projects on PyPI are made and
-shared by other members of the Python community
-* “release”: a specific version of a project. For example, the [requests](https://pypi.org/project/requests/) project
-has many releases, like "requests 2.10" and "requests 1.2.1". A release consists of one or more “files.”
-* “file”: also known as a “package,” is a file (in the broader non-PyPI sense) that you can download and install. 
-Because there are different types of hardware, operating systems, and file formats, a release may have several files
-(packages) associated with it, such as a binary “wheel” (which may be platform specific) or a source-code archive.
-
-Though that’s great in theory—and perhaps *PyPI* itself uses these words consistently—you don’t have to look far to
-see conflicting usage, such as referring to what PyPI calls a “project” as instead a “package.” (E.g., in PyPA’s
-[definion of the syntax for `setup.cfg`](https://packaging.python.org/en/latest/tutorials/packaging-projects/#configuring-metadata),
-referring to `name = example-package-YOUR-USERNAME-HERE` as the “package name” (rather than the “project name.”) Because
-the practice is widespread, I will often below refer to “the package” when I refer to what PyPI would call “the
-project.”
+For my use of “project” and “package” (including “import package” and “distribution package”) see Jim Ratliff,
+“[Unpacking ‘package’ terminology in Python](https://gist.github.com/jimratliff/fc799e74e8104e6b05e6894ce8555144),” GitHub Gist.
 ## Resources for topics not well covered here
 I will not go into a detailed explanation of many aspects of packaging more generally that are well covered
 elsewhere, e.g., the `LICENSE`,  `README`, `pyproject.toml`, and `setup.cfg` files (or why I’m
