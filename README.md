@@ -96,7 +96,7 @@ Python 3.9.
 ## Road map for the remainder of this README document
 
 * [`importlib.resources`: Selected basics](#importlibresources-selected-basics)
-* [File and directory structure]()
+* [File and directory structure; rationale for `src/` directory](#file-and-directory-structure-rationale-for-src-directory)
 * [Noncomprehensive comments on selected elements of project metadata](#noncomprehensive-comments-on-selected-elements-of-project-metadata)
 * [Finish development and upload to PyPI](#finish-development-and-upload-to-pypi)
 
@@ -186,13 +186,16 @@ following resources:
 PyPA’s tutorial “[Packaging Python Projects](https://packaging.python.org/en/latest/tutorials/packaging-projects)”
 * § “[The structure](https://blog.ionelmc.ro/2014/05/25/python-packaging/#the-structure)” in Ionel Cristian Mărieș,
 “[Packaging a python library](https://blog.ionelmc.ro/2014/05/25/python-packaging),” ionel’s codelog, September 30, 2019.
+    * E.g., the `src/` structure (a) ensures that you test your code from the same working directory that your users
+    will see when they install your package, (b) allows simpler packaging code and a simpler `MANIFEST.in`, and
+    (c) results in a much cleaner editable install.
 * Mark Smith’s presentation at EuroPython 2019: “Publishing (Perfect) Python Packages on PyPi”
 ([YouTube](https://www.youtube.com/watch?v=GIF3LaRqgXo),
 [GitHub](https://github.com/judy2k/publishing_python_packages_talk)), at 26:00:
-> Here’s why we use the `src/` directory. Our root directory is the directory we've been working in. If our code was in
+    * “Here’s why we use the `src/` directory. Our root directory is the directory we’ve been working in. If our code was in
 this directory—if we import `helloworld` while running the tests—it would run the code in our current directory. But we
 don’t want it to do that. We want it to test installing the package and using the code from there. By having the `src/`
-directory, you’re forcing it to use the version you’ve just installed into the versioned environment.
+directory, you’re forcing it to use the version you’ve just installed into the versioned environment.”
 
 
 ## Noncomprehensive comments on selected elements of project metadata
@@ -243,12 +246,20 @@ In the configuration file `setup.cfg`, in its `[options]` section, specify:
 #### Create `MANIFEST.in` and itemize the data files
 In the present case, the `MANIFEST.in` file contains the following and only the following:
 ```
-include src/demo_package_and_read_data_files/sample_data_pi.txt
-include src/demo_package_and_read_data_files/sample_data/sample_data_e.txt
+include src/demo_package_sample_data_with_code/sample_data_pi.txt
+graft src/demo_package_sample_data_with_code/sample_data
 ```
+Thanks to the structure adopted here, where the `src/` directory separates all the project metadata from the project
+code/data, the  `MANIFEST.in` perhaps could be made even simpler:
+```
+graft src
+```
+which would ensure that all files within `src/` are included in the distribution.
+([See](https://blog.ionelmc.ro/2014/05/25/python-packaging/#the-structure): “Without `src` writting a `MANIFEST.in` is tricky. … It’s much easier with a `src` directory: just add `graft src` in `MANIFEST.in`.)
+
 See, generally:
 § “[Including files in source distributions with `MANIFEST.in`](https://packaging.python.org/en/latest/guides/using-manifest-in/#)”
-of “[Python Packaging User Guide](https://packaging.python.org/en/latest/).”
+of “[Python Packaging User Guide](https://packaging.python.org/en/latest/).” 
 
 ### `setup.cfg`: Add a `python-tag` tag to force file name of resulting “wheel” distribution file to reflect partticular minimum version of Python
 This discussion will make more sense after you get to later section § “[The wheel file](#the-wheel-file),” but this discussion
