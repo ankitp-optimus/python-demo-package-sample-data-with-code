@@ -4,6 +4,7 @@ This package doesn’t do anything useful. It exists only as a vehicle to demons
 *  how to prepare a Python project that can be uploaded to the
 [Python Package Index (PyPI)](https://pypi.org/) as a release, from which it can then be installed on user systems using the
 [pip](https://pypi.org/project/pip/) package installer
+* use of a `src/` directory intermediate between the project directory and the outermost package directory
 *  how static text files (for example, templates, sample data, etc.) can be packaged and then—using
 `importlib.resources`—referenced and read from their host package or any other package, even if these files don’t
 actually reside on the file system (e.g., if they reside in a .zip archive). This is relevant because:
@@ -24,6 +25,15 @@ on a Mac (macOS 12.3.1). All citations/quotations to documentation and other so
 ## Terminology
 For my use of “project” and “package” (including “import package” and “distribution package”) see Jim Ratliff,
 “[Unpacking ‘package’ terminology in Python](https://gist.github.com/jimratliff/fc799e74e8104e6b05e6894ce8555144),” GitHub Gist.
+
+The PyPI project name is derived from the developer-specified `name` field in `setup.cfg` or `setup.py`. Note that, when
+the project name is formed by two or more separate words joined by a delimiter, PyPI will “normalize” the project name
+such that the words are joined by a hyphen (`-`) regardless of what the original delimiter was (in particular,
+underscores (`_`) are common). As far as I know, the developer-specified `name` field in `setup.cfg` or `setup.py` has 
+no other significance. So, to avoid confusion, I suggest that, when the project name has two or more words joined by
+delimiters, the developer specify hyphens for the delimiter from the get go, since that’s the form it will 
+ultimately take.
+
 ## Resources for topics not well covered here
 I will not go into a detailed explanation of many aspects of packaging more generally that are well covered
 elsewhere, e.g., the `LICENSE`,  `README`, `pyproject.toml`, and `setup.cfg` files (or why I’m
