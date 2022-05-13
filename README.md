@@ -4,9 +4,9 @@ This package doesn’t do anything useful. It exists only as a vehicle to demons
 *  how to prepare a Python project that can be uploaded to the
 [Python Package Index (PyPI)](https://pypi.org/) as a release, from which it can then be installed on user systems using the
 [pip](https://pypi.org/project/pip/) package installer
-*  how static text files (for example, templates, sample data, etc.) can be packaged and then
-referenced and read from their host package or any other package, even if these files don’t actually reside on the file
-system (e.g., if they reside in a .zip archive). This is relevant because:
+*  how static text files (for example, templates, sample data, etc.) can be packaged and then—using
+`importlib.resources`—referenced and read from their host package or any other package, even if these files don’t
+actually reside on the file system (e.g., if they reside in a .zip archive). This is relevant because:
     * [“[T]he PyPA recommends that any data files you wish to be accessible at run time be included **inside the package**.”](https://setuptools.pypa.io/en/latest/userguide/datafiles.html#non-package-data-files)
     * [PEP 302](https://peps.python.org/pep-0302/) added hooks to import from .zip files and Python Eggs.
 *  how to install the project in “editable”/“development” mode during development so that you can test the
