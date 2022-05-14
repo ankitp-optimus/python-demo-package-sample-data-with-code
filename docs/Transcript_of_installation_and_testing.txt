@@ -76,6 +76,11 @@ Successfully built demo-package-sample-data-with-code-0.0.1.tar.gz and demo_pack
 
 (venv) % python -m pip install --upgrade twine
 
+# Use `twine` to check the distribution files
+% twine check dist/*
+Checking dist/demo_package_and_read_data_files-0.0.1-py39-none-any.whl: PASSED
+Checking dist/demo_package_and_read_data_files-0.0.1.tar.gz: PASSED
+
 # Upload the distribution packages in dist/ to TestPyPI using twine
 
 (venv) % python -m twine upload --repository testpypi dist/*
@@ -113,7 +118,7 @@ Collecting demo-package-sample-data-with-code==0.0.1
 Installing collected packages: demo-package-sample-data-with-code
 Successfully installed demo-package-sample-data-with-code-0.0.1
 
-# Confirm it's installed
+# Confirm it’s installed
 (venv) % pip list
 Package                            Version
 ---------------------------------- -------
