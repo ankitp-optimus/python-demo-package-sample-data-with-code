@@ -9,7 +9,7 @@ This package doesn’t do anything useful. It exists only as a vehicle to demons
 actually reside on the file system (e.g., if they reside in a .zip archive). This is relevant because:
     * [“[T]he PyPA recommends that any data files you wish to be accessible at run time be included **inside the package**.”](https://setuptools.pypa.io/en/latest/userguide/datafiles.html#non-package-data-files)
     * [PEP 302](https://peps.python.org/pep-0302/) added hooks to import from .zip files and Python Eggs.
-* use of a `src/` directory intermediate between the project directory and the outermost package directory with multiple benefits
+* use of a `src/` directory intermediate between the project directory and the outermost package directory—with multiple benefits
 *  how to install the project in “editable”/“development” mode during development so that you can test the
 functionalities that access resources in packages—without having to rebuild and reinstall the package after every change.
 * how to use a `__main__.py` file as an entry point to the package, which will execute when the *package* is invoked on
@@ -98,7 +98,15 @@ Python 3.9.
 * [`importlib.resources`: Selected basics](#importlibresources-selected-basics)
 * [File and directory structure; rationale for `src/` directory](#file-and-directory-structure-rationale-for-src-directory)
 * [Noncomprehensive comments on selected elements of project metadata](#noncomprehensive-comments-on-selected-elements-of-project-metadata)
+    * Here I address those aspects of the project’s metadata that are particularly relevant to the particular goals of
+    this package.
 * [Finish development and upload to PyPI](#finish-development-and-upload-to-pypi)
+    * Here I walk through—stage by stage, and command by command—the process of:
+        * creating a virtual environment,
+        * finishing your development in a local “editable” or “development” install,
+        * building your project and turning it into a distribution package that can be uploaded to PyPI,
+        * uploading it to TestPyPI, 
+        * testing your distribution by created a new virtual environment and installing your project from TestPyPI.
 
 # `importlib.resources`: Selected basics
 ## Background
@@ -197,7 +205,6 @@ this directory—if we import `helloworld` while running the tests—it would ru
 don’t want it to do that. We want it to test installing the package and using the code from there. By having the `src/`
 directory, you’re forcing it to use the version you’ve just installed into the versioned environment.”
 
-
 ## Noncomprehensive comments on selected elements of project metadata
 Without going generally in how to prepare the various metadata files, here I highlight particular ways in which
 particular files must be changed or created so that our data files will be properly packaged.
@@ -209,22 +216,22 @@ filename that counts.)
 
 Here the relevant resources are two text files:
 * "sample_data_pi.txt"
-    * located at the root of the package, i.e.,
-    * demo_package_and_read_data_files/sample_data_pi.txt
+    * located at the root of the import package, i.e.,
+    * src/demo_package_and_read_data_files/sample_data_pi.txt
 * "sample_data_e.txt"
-    * located within a subfolder, "sample_data", of the package, i.e.,
-    * demo_package_and_read_data_files/sample_data/sample_data_e.txt
+    * located within a subfolder, "sample_data", of the import package, i.e.,
+    * src/demo_package_and_read_data_files/sample_data/sample_data_e.txt
 
-(Soley to demonstrate throwing a FileNotFoundError exception, `example.py` also attempts to open `meaning_of_life.txt`,
+(Soley to demonstrate throwing a `FileNotFoundError` exception, `example.py` also attempts to open `meaning_of_life.txt`,
 but, unsurprisingly, it does not exist.)
 
 In our case the requirement that each data file be in the root directory of a package  means that the following
 directories each must have an `__init__.py` file:
-*  `path/to/src/demo_package_and_read_data_files`
+*  `src/demo_package_and_read_data_files`
     * This directory would have been a package (and thus would have had an `__init__.py` file) even if we had no data
     files to worry about, so no additional `__init__.py` file is created for this directory on account of the data
     files.
-*  `path/to/src/demo_package_and_read_data_files/sample_data`
+*  `src/demo_package_and_read_data_files/sample_data`
     * This directory is *not* a directory of Python files, so it would not normally have an `__init__.py` file. Thus,
     in order to read the data file from inside, we need to “artificially” add an `__init__.py` file inside.
 ### Telling `setuptools` about data files that need to be included in the package
@@ -267,13 +274,13 @@ which would ensure that all files within `src/` are included in the distribution
 
 
 ### `setup.cfg`: Add a `python-tag` tag to force file name of resulting “wheel” distribution file to reflect partticular minimum version of Python
-This discussion will make more sense after you get to later section § “[The wheel file](#the-wheel-file),” but this discussion
+This discussion will make more sense after you get to the later section § “[The wheel file](#the-wheel-file),” but this discussion
 nevertheless logically belongs here.
 
 This package requires Python 3.9. My `setup.cfg` file originally contained the following excerpt:
 ```
 classifiers =
-    Programming Language :: Python :: 3.9
+    Programming Language :: Python :: 3
     License :: OSI Approved :: MIT License
     Operating System :: OS Independent
 
@@ -297,86 +304,24 @@ python-tag = py39
 ```
 After this change, the file name of the resulting wheel file including the Python Tag string `py39` as I desired.
 
-### Considerations regarding the inter-word separate character in a multiword package name
-Now I address issues that can arrive when you want the project name to have multiple words (rather than one continuous
-string of nonblank characters). You can’t separate these component words with a blank, so other possibilities for the
-separater are (a) underscore (`_`), (b) hyphen (`-`), or (c) dot (`.`).
+### Considerations regarding the inter-word separate character in a multiword project name
+The `name` field in `setup.cfg` (or `setup.py`) defines the name of your *project* as it will appear on PyPI. ([Examples
+will often misleadingly suggest](https://setuptools.pypa.io/en/latest/userguide/declarative_config.html) that this is the
+*package* name, in some incompletely specified notion of “package,” but the only effect of this field is to determine the
+*project* name on PyPI.)
 
-PyPI uses the concept of “normalized name,” which is the name that results when an input name is converted to lowercase
-and all runs of hyphens, underscores, and periods are converted to a single hyphen. (See [PEP 503, § Normalized Names](https://peps.python.org/pep-0503/#normalized-names). See also [PEP 426](https://peps.python.org/pep-0426/#name): “As distribution names are used
-as part of URLs, filenames, command line parameters and must also interoperate with other packaging systems, the
-permitted characters are constrained to: • ASCII letters ([a-zA-Z]) • ASCII digits ([0-9]) • underscores (_) • hyphens
-• (-) periods (.). Distribution names MUST start and end with an ASCII letter or digit. … All comparisons of
-distribution names MUST be case insensitive, and MUST consider hyphens and underscores to be equivalent.” There is also
-discussion of “confusable” characters.”) 
+When, for better readability, you want your project name to have multiple words, you need to have a nonspace delimiter
+between these words. However, no matter what delimiter you prefer, e.g., underscore (`_`), hyphen (`-`), or dot (`.`),
+PyPI will ignore your expressed intention and “[normalize](https://peps.python.org/pep-0503/#normalized-names)” the name
+so that each such delimiter (or even runs of delimiters) is replaced with a single hyphen. So, to avoid confusion, I
+suggest that, when the project name has two or more words joined by delimiters, you specify hyphens for the delimiter
+from the get go, since that’s the form it will ultimately take.
 
-The PyPI project name is derived from the developer-specified `name` field in `setup.cfg` or `setup.py`. Note that, when
-the project name is formed by two or more separate words joined by a delimiter, PyPI will
-“[normalize](https://peps.python.org/pep-0503/#normalized-names)” the project name
-such that the words are joined by a hyphen (`-`) regardless of what the original delimiter was (in particular,
-underscores (`_`) are common). As far as I know, the developer-specified `name` field in `setup.cfg` or `setup.py` has 
-no other significance. So, to avoid confusion, I suggest that, when the project name has two or more words joined by
-delimiters, the developer specify hyphens for the delimiter from the get go, since that’s the form it will 
-ultimately take.
-
-In an early iteration, I consistently used the same name (`demo_package_and_read_data_files`) for (a) the directory
-immediately contained by `src/` and (b) the package/project name declared to PyPI in `setup.cfg`. (I also used the same
-name for the corresponding GitHub repository, though that likely has less import.) Note the underscores separating
-words. This name was preserved through the `build` process; the wheel and source archive names were:
-```
-demo_package_and_read_data_files-0.0.1-py3-none-any.whl
-demo_package_and_read_data_files-0.0.1.tar.gz
-```
-After uploading these to TestPyPI via `twine`, however, was there the first sign of a name transformation:
-```
-View at:
-https://test.pypi.org/project/demo-package-and-read-data-files/0.0.1/
-```
-Note the hyphens in `demo-package-and-read-data-files` replacing what had been underscores. (This hypenated version is
-also the same name at the top of the project’s webpage at PyPI.)
-
-Then, to test the TestPyPI offering, I created a new directory and corresponding new virtual environment. I installed
-the package there using
-```
-% cd GitHub_repos
-% mkdir test_package
-% cd test_package 
-% python3 -m venv venv
-% source venv/bin/activate
-% python -m pip install --upgrade pip
-% pip install -i https://test.pypi.org/simple/demo-package-and-read-data-files==0.0.1
-    …
-    …
-Successfully installed demo-package-and-read-data-files-0.0.1
-```
-
-And when I listed the pip-installed packages in the virtual environment:
-```
-% pip list
-Package                          Version
--------------------------------- -------
-demo-package-and-read-data-files 0.0.1
-pip                              22.0.4
-setuptools                       60.10.0
-```
-Thus, pip is representing that the true name of this package is the hyphenated version.
-
-However, when I then tried to execute the package by referring to its hyphenated package name:
-```
-% python -m demo-package-and-read-data-files
-path/to/GitHub_repos/test_package/venv/bin/python: No module named demo-package-and-read-data-files
-
-
-% python -m demo_package_and_read_data_files
-        THIS WORKED!
-```
-Moral of the story: Although all module names must be without hyphens, and can have underscores, it’s better to name the
-package/project with hyphens. That way the user can call python to execute the project by the same name that PyPI
-displays for the project.
-
-
-
-
+Of course, you might want the *import package* of your project to have the same name as your project; that’s common.
+But if your project has multiple words separted by delimiters, this won’t be exactly possible. The best you could do is
+name your import package the same as the project, but substituting an underscore for each delimiter. E.g.,
+* Project name: `my-cool-thing`
+* Import package name: `my_cool_thing`
 
 ### `__main__.py` is executed when package invoked from command line with `-m` flag; allows for a CLI
 Although not appropriate in all cases, including a `__main__.py` file establishes an entry point for the case where
@@ -384,6 +329,9 @@ the package name is invoked directly from the command line with the `-m` flag, e
 ```
 python -m demo_package_and_read_data_files
 ```
+(Note that the import package name, `demo_package_and_read_data_files` must use underscores as the inter-word delimiter,
+even though the project name uses hyphens for the delimiter.)
+
 (In general, the `-m` flag
 [tells Python to search `sys.path` for the named module and execute its contents as the `__main__` module](https://docs.python.org/3/using/cmdline.html#cmdoption-m). Since the argument is a module name, you must not give a file extension (.py). What’s crucial
 for us here is that package names (including namespace packages) are also permitted. When a package name is supplied
@@ -401,11 +349,18 @@ Note that [the contents of `__main__.py` typically aren’t fenced with `if __na
 Loosely, `__main__.py` is to a package what a `main()` function is to a console script. (E.g., “[main functions are often used to create command-line tools by specifying them as entry points for console scripts](https://docs.python.org/3/library/__main__.html#packaging-considerations).”)
 
 # Finish development and upload to PyPI
+Here I walk through—stage by stage, and command by command—the process of:
+* creating a virtual environment,
+* finishing your development in a local “editable” or “development” install,
+* building your project and turning it into a distribution package that can be uploaded to PyPI,
+* uploading it to TestPyPI, 
+* testing your distribution by created a new virtual environment and installing your project from TestPyPI.
 ## Create a virtual environment
 From here on, I’m assuming that you’re using a virtual environment. I use
 [venv](https://docs.python.org/3/library/venv.html), noting that, per the Python Packaging User Guide
 (§ “[Installing packages using pip and virtual environments](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/#creating-a-virtual-environment)”):
-“If you are using Python 3.3 or newer, the venv module is the preferred way to create and manage virtual environments.”
+“If you are using Python 3.3 or newer, the `venv` module is the preferred way to create and manage virtual
+environments.”
 
 Generally, see:
 * [§ 12. Virtual Environments and Packages](https://docs.python.org/3/tutorial/venv.html) of Python Docs.
@@ -413,10 +368,11 @@ Generally, see:
 signaled by its title, there is substantial discussion of the why and how of using a virtual environment.
 
 ## Install the project in “editable mode”/“development mode” in order to test and further develop it
-When still developing the package, we want to install the package from the local source (and therefore *not* from
-PyPI). Moreover, we do so in “editable mode,” which is essentially
-“[setuptools develop mode](https://setuptools.pypa.io/en/latest/userguide/development_mode.html).” In this mode, you
-continue to work on the code without needing to rebuild and reinstall the project every time you make a change.
+When still developing the package, and before ever publishing it to PyPI (or even TestPyPI), we want to install the
+package from the local source (and therefore *not* from PyPI). Moreover, we do so in “editable mode,” which is
+essentially “[setuptools develop mode](https://setuptools.pypa.io/en/latest/userguide/development_mode.html).” In this
+mode, you continue to work on the code without needing to rebuild and reinstall the project every time you make a
+change.
 
 (See generally § “[Local project installs](https://pip.pypa.io/en/latest/topics/local-project-installs/)” in the
 [`pip` documentation](https://pip.pypa.io/en/latest/), and in particular
