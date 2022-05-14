@@ -355,6 +355,10 @@ Here I walk through—stage by stage, and command by command—the process of:
 * building your project and turning it into a distribution package that can be uploaded to PyPI,
 * uploading it to TestPyPI, 
 * testing your distribution by created a new virtual environment and installing your project from TestPyPI.
+
+
+A full transcript (where only some of the output is condensed) of this process is available at: [docs/Transcript_of_installation_and_testing.txt)](https://github.com/jimratliff/python-demo-package-sample-data-with-code/blob/main/docs/Transcript_of_installation_and_testing.txt).
+
 ## Create a virtual environment
 From here on, I’m assuming that you’re using a virtual environment. I use
 [venv](https://docs.python.org/3/library/venv.html), noting that, per the Python Packaging User Guide
@@ -410,9 +414,9 @@ Installing in editable mode allows you to edit the code and immediately see the 
 reinstall the package.
 
 ## Build the distribution package to upload to PyPI
-When develop matures to the point of having a version of the package you want to distribute via PyPI, the next step is
+When development matures to the point of having a version of the project you want to distribute via PyPI, the next step is
 to generate a [distribution package](https://packaging.python.org/en/latest/glossary/#term-Distribution-Package) for the
-package.
+project.
 
 ### Install `build`
 The first step is to install [`build`](https://pypa-build.readthedocs.io/en/stable/index.html) into your virtual environment (or upgrade if it already exists there) with
@@ -433,8 +437,8 @@ Packaging User Guide » Tutorials.
 This generates a fair amount of output and creates a `dist` directory at the project root, which now contains the 
 following two files:
 ```
-demo_package_and_read_data_files-0.0.1-py3-none-any.whl
-demo_package_and_read_data_files-0.0.1.tar.gz
+demo_package_sample_data_with_code-0.0.1-py39-none-any.whl
+demo-package-sample-data-with-code-0.0.1.tar.gz
 ```
 #### The wheel file
 The first of these, with the `.whl` extension is a “wheel” file, or
@@ -450,11 +454,7 @@ by [PEP 425 – Compatibility Tags for Built Distributions](https://peps.python.
 “[The challenges in designing a library for PEP 425 (aka wheel tags)](https://snarky.ca/the-challenges-in-designing-a-library-for-pep-425/),” *Tall, Snarky Canadian*, June 1, 2019.
 
 In the present case:
-* `py3`: (“Python Tag”) Iindicates that the package requires Python 3.
-    * Note that this does not acknowledge that, more specifically, Python 3.9 is required for this package. Thus, a
-    user would need to look as well at the `python_requires = >=3.9` entry in `setup.cfg`. (See “What tag do I use if my
-    distribution uses a feature exclusive to the newest version of Python?” under
-    [FAQ](https://peps.python.org/pep-0425/#faq).)
+* `py39`: (“Python Tag”) Iindicates that the package requires Python 3.9.
 * `none`: (“ABI Tag,” referring to
 [Application Binary Interface](https://en.wikipedia.org/wiki/Application_binary_interface)) Indicates which Python ABI
 is required by any included extension modules. `none` “[represent[s] the case of not caring. This is typically seen with py interpreter tags since you shouldn't care about what ABI an interpreter supports if you're targeting just the Python language and not a specific interpreter](https://snarky.ca/the-challenges-in-designing-a-library-for-pep-425/).”
