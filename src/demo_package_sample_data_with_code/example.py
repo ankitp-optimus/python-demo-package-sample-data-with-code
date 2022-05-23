@@ -27,7 +27,7 @@ def read_text_from_resource(packagename, filename):
     try:
         # The following is equivalent to using the “/” in the next following line.
         # resource_location_as_string = files(packagename).joinpath(filename)
-        resource_location_as_string = files(packagename) / filename
+        resource_location_as_string = files(packagename) / constants.CHOSEN_SAMPLE_PGN_FILE
 
         # Use the following substitute only to test the "module not found" trap
         # resource_location_as_string = files('nonexistent_package') / filename
