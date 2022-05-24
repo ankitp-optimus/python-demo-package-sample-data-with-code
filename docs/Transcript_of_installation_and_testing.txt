@@ -17,7 +17,7 @@ Package    Version
 pip        22.0.4
 setuptools 60.10.0
 
-# LOCAL install for development purpoases
+# LOCAL install for development purposes
 # install the package contained in the current directory (“.”) in “editable/development mode”
 (venv) % pip install -e .
 Obtaining file:///path/to/demo-package-sample-data-with-code
