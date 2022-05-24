@@ -10,6 +10,8 @@ actually reside on the file system (e.g., if they reside in a .zip archive). Thi
     * [“[T]he PyPA recommends that any data files you wish to be accessible at run time be included **inside the package**.”](https://setuptools.pypa.io/en/latest/userguide/datafiles.html#non-package-data-files)
     * [PEP 302](https://peps.python.org/pep-0302/) added hooks to import from .zip files and Python Eggs.
 * use of a `src/` directory intermediate between the project directory and the outermost package directory—with multiple benefits
+* How to provide a single source for the version number, in this case by supplying a `__version__.py` file in the import
+module that is (a) imported by `__init__.py` and referenced by `setup.cfg`
 *  how to install the project in “editable”/“development” mode during development so that you can test the
 functionalities that access resources in packages—without having to rebuild and reinstall the package after every change.
 * how to use a `__main__.py` file as an entry point to the package, which will execute when the *package* is invoked on
@@ -171,14 +173,15 @@ This project has the following initial directory/file structure:
 ├── docs
 ├── src
 │   ├── demo_package_and_read_data_files
-│   │   ├── __init__.py
-│   │   ├── __main__.py
-│   │   ├── constants.py
-│   │   ├── example.py
 │   │   ├── sample_data
 │   │   │   ├── __init__.py
 │   │   │   └── sample_data_e.txt
 │   │   └── sample_data_pi.txt
+│   │   ├── __init__.py
+│   │   ├── __main__.py
+│   │   ├── __version__.py
+│   │   ├── constants.py
+│   │   ├── example.py
 └── tests
 ```
 By “initial directory/file structure,” I acknowledge that additional directories will be generated as a result of
@@ -205,10 +208,50 @@ this directory—if we import `helloworld` while running the tests—it would ru
 don’t want it to do that. We want it to test installing the package and using the code from there. By having the `src/`
 directory, you’re forcing it to use the version you’ve just installed into the versioned environment.”
 
-## Noncomprehensive comments on selected elements of project metadata
-Without going generally in how to prepare the various metadata files, here I highlight particular ways in which
-particular files must be changed or created so that our data files will be properly packaged.
+## Noncomprehensive comments on selected elements of the project metadata and structure
+### Establishing a single source for the version number ###
+This project defines its version number consistent with a frequently expressed desideratum referred to as
+“[single-sourcing the package version](https://packaging.python.org/en/latest/guides/single-sourcing-package-version/)”.
 
+This requires coordination between three files: (a) `setup.cfg`, (b) `__init__.py`, and (c) `__version__.py`, as
+described below.
+
+For further discussion on this topic, see the answers to “Set `__version__` of module from a file when configuring
+setuptools using `setup.cfg` without `setup.py`,” Stack Overflow, May 23, 2022,
+https://stackoverflow.com/questions/72357031/set-version-of-module-from-a-file-when-configuring-setuptools-using-setup
+
+#### The version number should be declared in the `__version__.py` file ####
+The version number is defined in the `__version__.py` file, within the root of import package, i.e., at path:
+```
+/path/to/demo-package-sample-data-with-code/src/demo_package_sample_data_with_code/__version__.py
+```
+with the syntax:
+```
+__version__ = '0.0.2'
+```
+This must be coupled with both an `import` in the `__init__.py` file and the appropriate directive in the `setup.cfg`
+file.
+#### The `__init__.py` file must import the `__version__` attribute ####
+The `__init__.py` file, also within the root of the import package, i.e., at path:
+```
+/path/to/demo-package-sample-data-with-code/src/demo_package_sample_data_with_code/__init__.py
+```
+must include the following `import` command:
+```
+from . __version__ import __version__
+```
+This import statement is discussed in detail at https://stackoverflow.com/a/72357032/8401379
+#### The `setup.cfg` file’s `version` declaration  must be properly defined to use the `attr:` special directive
+The `setup.cfg` file, in the root of the project directory, i.e., at the path
+```
+/path/to/demo-package-sample-data-with-code/setup.cfg
+```
+must include the following snippet:
+```
+[metadata]
+  …
+version = attr: demo_package_sample_data_with_code.__version__
+```
 ### The directory that immediately encloses each resource must be a package and thus must have an `__init__.py` file
 `importlib.resources` considers a file a resource only if the file is in the root directory of a package. A directory
 cannot be a package unless it includes a `__init__.py` file. (It’s fine if this `__init__.py` file is empty. It’s its
@@ -357,7 +400,7 @@ Here I walk through—stage by stage, and command by command—the process of:
 * testing your distribution by created a new virtual environment and installing your project from TestPyPI.
 
 
-A full transcript (where only some of the output is condensed) of this process is available at: [docs/Transcript_of_installation_and_testing.txt)](https://github.com/jimratliff/python-demo-package-sample-data-with-code/blob/main/docs/Transcript_of_installation_and_testing.txt).
+A full transcript (where only some of the output is condensed) of this process is available at: [docs/Transcript_of_installation_and_testing.txt](https://github.com/jimratliff/python-demo-package-sample-data-with-code/blob/main/docs/Transcript_of_installation_and_testing.txt).
 
 ## Create a virtual environment
 From here on, I’m assuming that you’re using a virtual environment. I use
