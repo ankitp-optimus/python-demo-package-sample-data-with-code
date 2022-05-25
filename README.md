@@ -2,33 +2,49 @@
 ## Goals of this project
 This package doesn’t do anything useful. It exists only as a vehicle to demonstrate:
 *  how to prepare a Python project that can be uploaded to the
-[Python Package Index (PyPI)](https://pypi.org/) as a release, from which it can then be installed on user systems using the
-[pip](https://pypi.org/project/pip/) package installer
+[Python Package Index (PyPI)](https://pypi.org/) as a release, from which it can then be installed on user systems using
+the [pip](https://pypi.org/project/pip/) package installer—using *static* metadata (`setup.cfg`) rather than dynamic
+metadata (`setup.py`)
 *  how static text files (for example, templates, sample data, etc.) can be packaged and then—using
 `importlib.resources`—referenced and read from their host package or any other package, even if these files don’t
 actually reside on the file system (e.g., if they reside in a .zip archive). This is relevant because:
     * [“[T]he PyPA recommends that any data files you wish to be accessible at run time be included **inside the package**.”](https://setuptools.pypa.io/en/latest/userguide/datafiles.html#non-package-data-files)
     * [PEP 302](https://peps.python.org/pep-0302/) added hooks to import from .zip files and Python Eggs.
 * use of a `src/` directory intermediate between the project directory and the outermost package directory—with multiple benefits
-* How to provide a single source for the version number, in this case by supplying a `__version__.py` file in the import
-module that is (a) imported by `__init__.py` and referenced by `setup.cfg`
+* how to provide a single source for the version number, in this case by supplying a `__version__.py` file in the import
+module that is (a) imported by `__init__.py` and (b) referenced by `setup.cfg`
 *  how to install the project in “editable”/“development” mode during development so that you can test the
-functionalities that access resources in packages—without having to rebuild and reinstall the package after every change.
+functionalities that access resources in packages—without having to rebuild and reinstall the package after every change
 * how to tell the `build` mechanism to identify a specific version of Python, e.g., `py39`, in the “Python Tag” in
 the file name of the resulting “wheel” (`.whl`) distribution file, so that users will be better informed of the
-Python-version requirement before attempting to install the package.
+Python-version requirement before attempting to install the package
 * how to use a `__main__.py` file as an entry point to the package, which will execute when the *package* is invoked on
-the command line with the `-m` flag (as opposed to executing the module).
+the command line with the `-m` flag (e.g., `python -m my_package`)
+* how to define a console-script entry point, e.g., `my-command`, so that the user can simply and directly invoke
+`my-command` on the command line, rather than `python -m my_package`
 * how to provide for, and process, an optional argument on the command line.
 
-
 ## Python requirement; timeliness
-***NOTE: This package requires Python 3.9+.*** This package has been tested only on Python 3.9.12, with pip 22.0.4,
+***NOTE: This package requires Python 3.9+.*** This package has been tested only on Python 3.9.12, with pip 22.1.1,
 on a Mac (macOS 12.3.1). All citations/quotations to documentation and other sources were valid as of May 1, 2022.
 
 ## Terminology
 For my use of “project” and “package” (including “import package” and “distribution package”) see Jim Ratliff,
 “[Unpacking ‘package’ terminology in Python](https://gist.github.com/jimratliff/fc799e74e8104e6b05e6894ce8555144),” GitHub Gist.
+
+In particular, I very deliberately choose:
+* to use hyphens to separate the words in the *project* name: `demo-package-sample-data-with-code`
+  * I also use hyphens in the console-scripts entry-point command: `my-command` that the user can type on the command
+  line in lieu of the [runpy](https://docs.python.org/3/library/runpy.html) syntax:
+  `python -m demo_package_sample_data_with_code`
+* to use underscores to separate the works in the import package name: `demo_package_sample_data_with_code` as well as
+every other directory below that level.
+
+This isn’t a gratuitous attempt to confuse the reader but rather in the spirit of
+“[Explicit is better than implicit.](https://peps.python.org/pep-0020/)” In practice, the project name and import
+package name are often chosen to be the same. It then is ambiguous in many discussion whether that common name is
+invoked in any particular case (a) because it is the project name or (b) because it is the import package name. My
+distinguishing the two is meant to help clarify what drives various behaviors.
 
 ## Resources for topics not well covered here
 I will not go into a detailed explanation of many aspects of packaging more generally that are well covered
@@ -69,7 +85,7 @@ system and files in a zip file. This is great because you don't have to use` __f
 >The biggest problem with `pkg_resources` is that it has import-time side effects. Even if you’re never going to access
 your sample data, you’re paying the cost of it because as soon as you import `pkg_resources` you pay this penalty. …
 `pkg_resources` crawls over every entry in your `sys.path` and it builds up these working sets and does all this runtime 
-work. … If you have a lot on things on your `sys.path`, this can be very, very slow. … 
+work. … If you have a lot of things on your `sys.path`, this can be very, very slow. … 
 
 The better solution is:
 > Welcome to `importlib.resources`, a new module and API in Python 3.7 that is also available as a standalone library
@@ -101,7 +117,7 @@ Python 3.9.
 
 * [`importlib.resources`: Selected basics](#importlibresources-selected-basics)
 * [File and directory structure; rationale for `src/` directory](#file-and-directory-structure-rationale-for-src-directory)
-* [Noncomprehensive comments on selected elements of project metadata](#noncomprehensive-comments-on-selected-elements-of-project-metadata)
+* [Noncomprehensive comments on selected elements of the project metadata and structure](#Noncomprehensive-comments-on-selected-elements-of-the-project-metadata-and-structure)
     * Here I address those aspects of the project’s metadata that are particularly relevant to the particular goals of
     this package.
 * [Finish development and upload to PyPI](#finish-development-and-upload-to-pypi)
@@ -135,7 +151,7 @@ standalone backport of `importlib.resources` for earlier versions of Python, for
 ## The `files()` function
 This demo package calls the
 [function `importlib.resources.files(`*`package`*`)`](https://docs.python.org/3/library/importlib.html#importlib.resources.files),
-where *`package`* can be either a name or a module object that conforms to the `Package` requirements.The function
+where *`package`* can be either a name or a module object that conforms to the `Package` requirements. The function
 returns an instance of abstract base class `importlib.abc.Traversable`. This object has available a subset of
 `pathlib.Path` methods suitable for traversing directories and opening files:
 * `joinpath(`*child*`)`
@@ -183,7 +199,7 @@ This project has the following initial directory/file structure:
 │   │   ├── __main__.py
 │   │   ├── __version__.py
 │   │   ├── constants.py
-│   │   ├── example.py
+│   │   ├── my_module.py
 └── tests
 ```
 By “initial directory/file structure,” I acknowledge that additional directories will be generated as a result of
@@ -211,8 +227,8 @@ in
     will see when they install your package, (b) allows simpler packaging code and a simpler `MANIFEST.in`, and
     (c) results in a much cleaner editable install.
 * Mark Smith’s presentation at EuroPython 2019: “Publishing (Perfect) Python Packages on PyPi”
-([YouTube](https://www.youtube.com/watch?v=GIF3LaRqgXo),
-[GitHub](https://github.com/judy2k/publishing_python_packages_talk)), at 26:00:
+([YouTube](https://www.youtube.com/watch?v=GIF3LaRqgXo) at [26:00](https://youtube.com/clip/UgkxfbdPcyxLVokUw4w9ug1bhAAqCIeLSA8v),
+[GitHub](https://github.com/judy2k/publishing_python_packages_talk)):
     * “Here’s why we use the `src/` directory. Our root directory is the directory we’ve been working in. If our code was in
 this directory—if we import `helloworld` while running the tests—it would run the code in our current directory. But we
 don’t want it to do that. We want it to test installing the package and using the code from there. By having the `src/`
@@ -226,18 +242,17 @@ This project defines its version number consistent with a frequently expressed d
 This requires coordination between three files: (a) `setup.cfg`, (b) `__init__.py`, and (c) `__version__.py`, as
 described below.
 
-For further discussion on this topic, see the answers to “Set `__version__` of module from a file when configuring
-setuptools using `setup.cfg` without `setup.py`,” Stack Overflow, May 23, 2022,
-https://stackoverflow.com/questions/72357031/set-version-of-module-from-a-file-when-configuring-setuptools-using-setup
+For further discussion on this topic, see the answers to “[Set `__version__` of module from a file when configuring
+setuptools using `setup.cfg` without `setup.py`](https://stackoverflow.com/questions/72357031/set-version-of-module-from-a-file-when-configuring-setuptools-using-setup),” Stack Overflow, May 23, 2022.
 
-#### The version number should be declared in the `__version__.py` file ####
-The version number is defined in the `__version__.py` file, within the root of import package, i.e., at path:
+#### Specify the version number in the `__version__.py` file ####
+The version number is defined in the `__version__.py` file within the root of import package, i.e., at path:
 ```
 /path/to/demo-package-sample-data-with-code/src/demo_package_sample_data_with_code/__version__.py
 ```
 with the syntax:
 ```
-__version__ = '0.0.2'
+__version__ = '1.0.0'
 ```
 This must be coupled with both an `import` in the `__init__.py` file and the appropriate directive in the `setup.cfg`
 file.
@@ -275,7 +290,7 @@ Here the relevant resources are two text files:
     * located within a subfolder, "sample_data", of the import package, i.e.,
     * src/demo_package_and_read_data_files/sample_data/sample_data_e.txt
 
-(Soley to demonstrate throwing a `FileNotFoundError` exception, `example.py` also attempts to open `meaning_of_life.txt`,
+(Soley to demonstrate throwing a `FileNotFoundError` exception, `my_module.py` also attempts to open `meaning_of_life.txt`,
 but, unsurprisingly, it does not exist.)
 
 In our case the requirement that each data file be in the root directory of a package  means that the following
@@ -286,7 +301,7 @@ directories each must have an `__init__.py` file:
     files.
 *  `src/demo_package_and_read_data_files/sample_data`
     * This directory is *not* a directory of Python files, so it would not normally have an `__init__.py` file. Thus,
-    in order to read the data file from inside, we need to “artificially” add an `__init__.py` file inside.
+    in order to read the data file from inside, we need to artificially add an `__init__.py` file inside.
 ### Telling `setuptools` about data files that need to be included in the package
 `setuptools` will not by default incorporate arbitrary non-Python text files into the package when it builds it. Thus,
 you must tell `setuptools` which such files you want it to include.
