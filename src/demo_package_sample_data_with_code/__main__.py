@@ -5,14 +5,18 @@ Entry point for package.
 See, e.g., https://docs.python.org/3/library/__main__.html
 """
 
+import os
+
 from . import constants
-from . example import check_CLI_for_user_input
-from . example import print_value_from_resource
+from . my_module import check_CLI_for_user_input
+from . my_module import print_value_from_resource
 
 
 def main():
     print("I am here, in __main__.py.")
     print("\n" + 15*"# " + "\n")
+
+    print(f"\nThe current working directory: {os.getcwd()} \n")
 
     # Checks for command line argument 
     user_contribution = check_CLI_for_user_input()

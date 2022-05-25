@@ -5,7 +5,6 @@ a text file in a subfolder "sample_data".
 
 import argparse
 from importlib.resources import files
-import sys
 
 from . import constants
 
@@ -28,7 +27,6 @@ def check_CLI_for_user_input():
     return cli_arguments.user_wisdom
 
 
-
 def print_value_from_resource(message, packagename, filename):
     """
     Outputs the text read from a resource (identified by its immediately enclosing package and the resource’s filename),
@@ -36,6 +34,7 @@ def print_value_from_resource(message, packagename, filename):
     """
     data = read_text_from_resource(packagename, filename)
     print(f"{message}: {data}")
+
 
 def read_text_from_resource(packagename, filename):
     """
