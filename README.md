@@ -14,11 +14,13 @@ actually reside on the file system (e.g., if they reside in a .zip archive). Thi
 module that is (a) imported by `__init__.py` and referenced by `setup.cfg`
 *  how to install the project in “editable”/“development” mode during development so that you can test the
 functionalities that access resources in packages—without having to rebuild and reinstall the package after every change.
-* how to use a `__main__.py` file as an entry point to the package, which will execute when the *package* is invoked on
-the command line with the `-m` flag (as opposed to executing the module).
 * how to tell the `build` mechanism to identify a specific version of Python, e.g., `py39`, in the “Python Tag” in
 the file name of the resulting “wheel” (`.whl`) distribution file, so that users will be better informed of the
 Python-version requirement before attempting to install the package.
+* how to use a `__main__.py` file as an entry point to the package, which will execute when the *package* is invoked on
+the command line with the `-m` flag (as opposed to executing the module).
+* how to provide for, and process, an optional argument on the command line.
+
 
 ## Python requirement; timeliness
 ***NOTE: This package requires Python 3.9+.*** This package has been tested only on Python 3.9.12, with pip 22.0.4,
@@ -562,6 +564,7 @@ pip install -i https://test.pypi.org/simple/ demo-package-and-read-data-files==0
         …
         …
 Successfully installed demo-package-and-read-data-files-0.0.1
+
 % python -m demo-package-and-read-data-files
 No module named demo-package-and-read-data-files
 % pip list
@@ -571,19 +574,95 @@ demo-package-and-read-data-files 0.0.1
 pip                              22.0.4
 setuptools                       60.10.0
 
+
+
+
+```
+# Running the program from the command line
+## Running the program with no CLI argument
+When the user does not supply a CLI argument, a default message is printed:
+
+> The user declined to share any knowledge. 🙁
+
+```
 % python -m demo_package_and_read_data_files
 I am here, in __main__.py.
 
-# # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # #
+
+The user declined to share any knowledge. 🙁
 
 π: 3.14159265358979323846
 e: 2.71828182845904523536
 
+Please don’t be concerned when you see the following error message. It’s expected.
+
 Oops! The data file «meaning_of_life.txt» wasn’t found at this location:
-»» /Volumes/Avocado/Users/ada/Documents/GitHub_repos/test_package/venv/lib/python3.9/site-packages/demo_package_and_read_data_files/sample_data/meaning_of_life.txt.
-[Errno 2] No such file or directory: '/Volumes/Avocado/Users/ada/Documents/GitHub_repos/test_package/venv/lib/python3.9/site-packages/demo_package_and_read_data_files/sample_data/meaning_of_life.txt'
+»» /Volumes/Avocado/Users/ada/Documents/GitHub_repos/demo-package-sample-data-with-code/src/demo_package_sample_data_with_code/sample_data/meaning_of_life.txt.
+[Errno 2] No such file or directory: '/Volumes/Avocado/Users/ada/Documents/GitHub_repos/demo-package-sample-data-with-code/src/demo_package_sample_data_with_code/sample_data/meaning_of_life.txt'
 Meaning of life: I have no clue 🤪
 
-* * * * * * * * * * * * * * * 
+* * * * * * * * * * * * * * *
+```
+
+## Running the program with CLI argument a sequence of words
+The user is meant to enter text at the command line. If the user does not quote the string, it will be reported as a
+list of words, which will be `.join()`ed into a single string of space-separated words.
+```
+python -m demo_package_sample_data_with_code Wu Zetian was the only female emperor in China’s history
+I am here, in __main__.py.
+
+# # # # # # # # # # # # # # #
+
+The user chose to share: Wu Zetian was the only female emperor in China’s history
+
+π: 3.14159265358979323846
+e: 2.71828182845904523536
+
+Please don’t be concerned when you see the following error message. It’s expected.
+
+Oops! The data file «meaning_of_life.txt» wasn’t found at this location:
+»» /Volumes/Avocado/Users/ada/Documents/GitHub_repos/demo-package-sample-data-with-code/src/demo_package_sample_data_with_code/sample_data/meaning_of_life.txt.
+[Errno 2] No such file or directory: '/Volumes/Avocado/Users/ada/Documents/GitHub_repos/demo-package-sample-data-with-code/src/demo_package_sample_data_with_code/sample_data/meaning_of_life.txt'
+Meaning of life: I have no clue 🤪
+
+* * * * * * * * * * * * * * *
+```
+## Running the program with CLI argument a quoted string of a sequence of words
+```
+python -m demo_package_sample_data_with_code "Wu Zetian was the only female emperor in China’s history"
+I am here, in __main__.py.
+
+# # # # # # # # # # # # # # #
+
+The user chose to share: Wu Zetian was the only female emperor in China’s history
+
+π: 3.14159265358979323846
+e: 2.71828182845904523536
+
+Please don’t be concerned when you see the following error message. It’s expected.
+
+Oops! The data file «meaning_of_life.txt» wasn’t found at this location:
+»» /Volumes/Avocado/Users/ada/Documents/GitHub_repos/demo-package-sample-data-with-code/src/demo_package_sample_data_with_code/sample_data/meaning_of_life.txt.
+[Errno 2] No such file or directory: '/Volumes/Avocado/Users/ada/Documents/GitHub_repos/demo-package-sample-data-with-code/src/demo_package_sample_data_with_code/sample_data/meaning_of_life.txt'
+Meaning of life: I have no clue 🤪
+
+* * * * * * * * * * * * * * *
+```
+## Running the program with CLI argument a call for help: `--help`
+```
+python -m demo_package_sample_data_with_code --help
+I am here, in __main__.py.
+
+# # # # # # # # # # # # # # #
+
+usage: __main__.py [-h] [user_wisdom ...]
+
+positional arguments:
+  user_wisdom  Please share some wisdom
+
+optional arguments:
+  -h, --help   show this help message and exit
 
 ```
+

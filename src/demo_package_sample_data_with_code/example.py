@@ -3,10 +3,31 @@ Reads and prints approximations to (a) π, from a text file at the root of the p
 a text file in a subfolder "sample_data". 
 """
 
+import argparse
 from importlib.resources import files
 import sys
 
 from . import constants
+
+
+def check_CLI_for_user_input():
+    parser = argparse.ArgumentParser()
+
+    # Defines argument
+    #   nargs='*': All command-line arguments present are gathered into a list.
+    #       This allows the user to type a multi-word string without wrapping it in quotes.
+    #   If no command-line argument is present, the value from default will be produced.
+    #   type=str is included for clarity, but str  is the default type.
+    help_text = "Please share some wisdom (as a string of words, with or without enclosing quotation marks)"
+    parser.add_argument("user_wisdom", type=str, nargs='*', default=None, help=help_text)
+
+    # Parses argument(s) from CLI and assigns to left-hand side
+    cli_arguments = parser.parse_args()
+
+    # Reference an arg with dot notation, using the string with which the .add_argument was called
+    return cli_arguments.user_wisdom
+
+
 
 def print_value_from_resource(message, packagename, filename):
     """
