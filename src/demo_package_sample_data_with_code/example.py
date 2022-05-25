@@ -4,10 +4,9 @@ a text file in a subfolder "sample_data".
 """
 
 from importlib.resources import files
-
 import sys
 
-import demo_package_sample_data_with_code.constants as constants
+from . import constants
 
 def print_value_from_resource(message, packagename, filename):
     """

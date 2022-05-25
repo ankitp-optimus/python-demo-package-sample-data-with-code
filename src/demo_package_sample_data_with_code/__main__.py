@@ -5,8 +5,10 @@ Entry point for package.
 See, e.g., https://docs.python.org/3/library/__main__.html
 """
 
-import demo_package_sample_data_with_code.constants as constants
-from demo_package_sample_data_with_code.example import print_value_from_resource
+from . import constants
+from . example import check_CLI_for_user_input
+from . example import print_value_from_resource
+
 
 print("I am here, in __main__.py.")
 print("\n" + 15*"# " + "\n")
