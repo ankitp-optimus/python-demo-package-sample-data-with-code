@@ -195,6 +195,14 @@ standard but is gaining mindshare. I won’t attempt to justify it myself here, 
 following resources:
 * § “[A simple project](https://packaging.python.org/en/latest/tutorials/packaging-projects/#a-simple-project)” in
 PyPA’s tutorial “[Packaging Python Projects](https://packaging.python.org/en/latest/tutorials/packaging-projects)”
+* From [Building and Distributing Packages with Setuptools](https://setuptools.pypa.io/en/latest/userguide/index.html),
+PyPA
+  * §§ “[Using a `src/` layout](https://setuptools.pypa.io/en/latest/userguide/declarative_config.html#using-a-src-layout)
+in
+§ “[Configuring setuptools using `setup.cfg` files](https://setuptools.pypa.io/en/latest/userguide/declarative_config.html#configuring-setuptools-using-setup-cfg-files)
+  * §§ “[src-layout](https://setuptools.pypa.io/en/latest/userguide/package_discovery.html#src-layout)” of § “[Automatic discovery](https://setuptools.pypa.io/en/latest/userguide/package_discovery.html#automatic-discovery)”
+> This layout is very handy when you wish to use automatic discovery, since you don’t have to worry about other Python files or folders in your project root being distributed by mistake. In some circumstances it can be also less error-prone for testing or when using PEP 420-style packages. On the other hand you cannot rely on the implicit PYTHONPATH=. to fire up the Python REPL and play with your package (you will need an editable install to be able to do that).
+
 * § “[The structure](https://blog.ionelmc.ro/2014/05/25/python-packaging/#the-structure)” in Ionel Cristian Mărieș,
 “[Packaging a python library](https://blog.ionelmc.ro/2014/05/25/python-packaging),” ionel’s codelog, September 30, 2019.
     * E.g., the `src/` structure (a) ensures that you test your code from the same working directory that your users
