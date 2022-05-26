@@ -412,9 +412,36 @@ This can also be combined with reading additional arguments entered on the comma
 See § “[`__main__.py` in Python Packages](https://docs.python.org/3/library/__main__.html#main-py-in-python-packages)”
 in “[`__main__` — Top-level code environment](https://docs.python.org/3/library/__main__.html),” docs.python.org.
 
-Note that [the contents of `__main__.py` typically aren’t fenced with `if __name__ == '__main__'` blocks](https://docs.python.org/3/library/__main__.html#id1).
+Note that
+[the contents of `__main__.py` typically aren’t fenced with `if __name__ == '__main__'` blocks](https://docs.python.org/3/library/__main__.html#id1).
 
-Loosely, `__main__.py` is to a package what a `main()` function is to a console script. (E.g., “[main functions are often used to create command-line tools by specifying them as entry points for console scripts](https://docs.python.org/3/library/__main__.html#packaging-considerations).”)
+Loosely, `__main__.py` is to a package what a `main()` function is to a console script. (E.g.,
+“[main functions are often used to create command-line tools by specifying them as entry points for console scripts](https://docs.python.org/3/library/__main__.html#packaging-considerations).”)
+
+## Establish a console-script entry-point command for a user to execute the program
+Adding a console script entry point allows the package to define a user-friendly name for installers of the package to
+execute. See § “[Entry Points](https://setuptools.pypa.io/en/latest/userguide/entry_point.html#entry-points)” of
+[Building and Distributing Packages with Setuptools](https://setuptools.pypa.io/en/latest/userguide/index.html), PyPA.
+
+To implement such a user-friendly command name, here `my-command`, we need to make modifications to (a) `setup.cfg` and
+(b) `__init__.py`.
+### In `setup.cfg`
+```
+[options.entry_points]
+console_scripts =
+    my-command = demo_package_sample_data_with_code.__main__:main
+```
+### In `__init__.py`
+```
+# The following import was apparently required to get the  console script
+# entry point to work. Without this import, I got errors at run time (when
+# issuing the command `demo-command` on the command line, but not when using
+# `runpy`, i.e., `python -m`):
+#    AttributeError: module 'demo_package_sample_data_with_code' has no attribute 'main'
+# Thus by importing main() in __init__.py, `main` was in the proper namespace.
+
+from . __main__ import main
+```
 
 # Finish development and upload to PyPI
 Here I walk through—stage by stage, and command by command—the process of:
