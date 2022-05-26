@@ -39,7 +39,7 @@ In particular, I very deliberately choose:
   * I also use hyphens in the console-scripts entry-point command: `my-command` that the user can type on the command
   line in lieu of the [runpy](https://docs.python.org/3/library/runpy.html) syntax:
   `python -m demo_package_sample_data_with_code`
-* to use underscores to separate the works in the import package name: `demo_package_sample_data_with_code` as well as
+* to use underscores to separate the words in the import package name: `demo_package_sample_data_with_code` as well as
 every other directory below that level.
 
 This isn’t a gratuitous attempt to confuse the reader but rather in the spirit of
