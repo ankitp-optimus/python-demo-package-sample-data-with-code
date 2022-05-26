@@ -10,7 +10,8 @@ metadata (`setup.py`)
 actually reside on the file system (e.g., if they reside in a .zip archive). This is relevant because:
     * [“[T]he PyPA recommends that any data files you wish to be accessible at run time be included **inside the package**.”](https://setuptools.pypa.io/en/latest/userguide/datafiles.html#non-package-data-files)
     * [PEP 302](https://peps.python.org/pep-0302/) added hooks to import from .zip files and Python Eggs.
-* use of a `src/` directory intermediate between the project directory and the outermost package directory—with multiple benefits
+* use of a `src/` directory intermediate between the project directory and the outermost package directory—with multiple
+benefits
 * how to provide a single source for the version number, in this case by supplying a `__version__.py` file in the import
 module that is (a) imported by `__init__.py` and (b) referenced by `setup.cfg`
 *  how to install the project in “editable”/“development” mode during development so that you can test the
@@ -30,7 +31,8 @@ on a Mac (macOS 12.3.1). All citations/quotations to documentation and other so
 
 ## Terminology
 For my use of “project” and “package” (including “import package” and “distribution package”) see Jim Ratliff,
-“[Unpacking ‘package’ terminology in Python](https://gist.github.com/jimratliff/fc799e74e8104e6b05e6894ce8555144),” GitHub Gist.
+“[Unpacking ‘package’ terminology in Python](https://gist.github.com/jimratliff/fc799e74e8104e6b05e6894ce8555144),”
+GitHub Gist.
 
 In particular, I very deliberately choose:
 * to use hyphens to separate the words in the *project* name: `demo-package-sample-data-with-code`
@@ -44,7 +46,7 @@ This isn’t a gratuitous attempt to confuse the reader but rather in the spirit
 “[Explicit is better than implicit.](https://peps.python.org/pep-0020/)” In practice, the project name and import
 package name are often chosen to be the same. It then is ambiguous in many discussion whether that common name is
 invoked in any particular case (a) because it is the project name or (b) because it is the import package name. My
-distinguishing the two is meant to help clarify what drives various behaviors.
+distinguishing the two is meant to help clarify what drives various behaviors. (See also #Considerations-regarding-the-inter-word-delimiter-character-in-a-multiword-project-name.)
 
 ## Resources for topics not well covered here
 I will not go into a detailed explanation of many aspects of packaging more generally that are well covered
@@ -218,21 +220,29 @@ PyPA
   * §§ “[Using a `src/` layout](https://setuptools.pypa.io/en/latest/userguide/declarative_config.html#using-a-src-layout)
 in
 § “[Configuring setuptools using `setup.cfg` files](https://setuptools.pypa.io/en/latest/userguide/declarative_config.html#configuring-setuptools-using-setup-cfg-files)
-  * §§ “[src-layout](https://setuptools.pypa.io/en/latest/userguide/package_discovery.html#src-layout)” of § “[Automatic discovery](https://setuptools.pypa.io/en/latest/userguide/package_discovery.html#automatic-discovery)”
-> This layout is very handy when you wish to use automatic discovery, since you don’t have to worry about other Python files or folders in your project root being distributed by mistake. In some circumstances it can be also less error-prone for testing or when using PEP 420-style packages. On the other hand you cannot rely on the implicit PYTHONPATH=. to fire up the Python REPL and play with your package (you will need an editable install to be able to do that).
+  * §§ “[src-layout](https://setuptools.pypa.io/en/latest/userguide/package_discovery.html#src-layout)” of
+  § “[Automatic discovery](https://setuptools.pypa.io/en/latest/userguide/package_discovery.html#automatic-discovery)”
+> This layout is very handy when you wish to use automatic discovery, since you don’t have to worry about other Python
+files or folders in your project root being distributed by mistake. In some circumstances it can be also less
+error-prone for testing or when using PEP 420-style packages. On the other hand you cannot rely on the implicit
+PYTHONPATH=. to fire up the Python REPL and play with your package (you will need an editable install to be able to do
+that).
 
 * § “[The structure](https://blog.ionelmc.ro/2014/05/25/python-packaging/#the-structure)” in Ionel Cristian Mărieș,
-“[Packaging a python library](https://blog.ionelmc.ro/2014/05/25/python-packaging),” ionel’s codelog, September 30, 2019.
+“[Packaging a python library](https://blog.ionelmc.ro/2014/05/25/python-packaging),” ionel’s codelog, September 30,
+2019.
     * E.g., the `src/` structure (a) ensures that you test your code from the same working directory that your users
     will see when they install your package, (b) allows simpler packaging code and a simpler `MANIFEST.in`, and
     (c) results in a much cleaner editable install.
 * Mark Smith’s presentation at EuroPython 2019: “Publishing (Perfect) Python Packages on PyPi”
-([YouTube](https://www.youtube.com/watch?v=GIF3LaRqgXo) at [26:00](https://youtube.com/clip/UgkxfbdPcyxLVokUw4w9ug1bhAAqCIeLSA8v),
+([YouTube](https://www.youtube.com/watch?v=GIF3LaRqgXo) at
+[26:00](https://youtube.com/clip/UgkxfbdPcyxLVokUw4w9ug1bhAAqCIeLSA8v),
 [GitHub](https://github.com/judy2k/publishing_python_packages_talk)):
-    * “Here’s why we use the `src/` directory. Our root directory is the directory we’ve been working in. If our code was in
-this directory—if we import `helloworld` while running the tests—it would run the code in our current directory. But we
-don’t want it to do that. We want it to test installing the package and using the code from there. By having the `src/`
-directory, you’re forcing it to use the version you’ve just installed into the versioned environment.”
+    * “Here’s why we use the `src/` directory. Our root directory is the directory we’ve been working in. If our code
+    was inthis directory—if we import `helloworld` while running the tests—it would run the code in our current
+    directory. But we don’t want it to do that. We want it to test installing the package and using the code from there.
+    By having the `src/` directory, you’re forcing it to use the version you’ve just installed into the versioned
+    environment.”
 
 ## Noncomprehensive comments on selected elements of the project metadata and structure
 ### Establishing a single source for the version number ###
@@ -290,8 +300,8 @@ Here the relevant resources are two text files:
     * located within a subfolder, "sample_data", of the import package, i.e.,
     * src/demo_package_and_read_data_files/sample_data/sample_data_e.txt
 
-(Soley to demonstrate throwing a `FileNotFoundError` exception, `my_module.py` also attempts to open `meaning_of_life.txt`,
-but, unsurprisingly, it does not exist.)
+(Soley to demonstrate throwing a `FileNotFoundError` exception, `my_module.py` also attempts to open
+`meaning_of_life.txt`, but, unsurprisingly, it does not exist.)
 
 In our case the requirement that each data file be in the root directory of a package  means that the following
 directories each must have an `__init__.py` file:
@@ -338,12 +348,13 @@ code/data, the  `MANIFEST.in` perhaps could be made even simpler:
 graft src
 ```
 which would ensure that all files within `src/` are included in the distribution.
-(See [Ionel Cristian Mărieș](https://blog.ionelmc.ro/2014/05/25/python-packaging/#the-structure): “Without `src` writting a `MANIFEST.in` is tricky. … It’s much easier with a `src` directory: just add `graft src` in `MANIFEST.in`.)
+(See [Ionel Cristian Mărieș](https://blog.ionelmc.ro/2014/05/25/python-packaging/#the-structure): “Without `src`
+writting a `MANIFEST.in` is tricky. … It’s much easier with a `src` directory: just add `graft src` in `MANIFEST.in`.)
 
 
 ### `setup.cfg`: Add a `python-tag` tag to force file name of resulting “wheel” distribution file to reflect partticular minimum version of Python
-This discussion will make more sense after you get to the later section § “[The wheel file](#the-wheel-file),” but this discussion
-nevertheless logically belongs here.
+This discussion will make more sense after you get to the later section § “[The wheel file](#the-wheel-file),” but this
+discussion nevertheless logically belongs here.
 
 This package requires Python 3.9. My `setup.cfg` file originally contained the following excerpt:
 ```
@@ -365,18 +376,19 @@ that was simply `py3` rather than `py39` (which would have indicated a minimum P
 So I next changed the `Python` tag in the `Classifiers` section to explicitly state version 3.9. However, that did not
 affect the Python Tag in the file name of the resulting wheel file.
 
-I finally—inspired by [this answer on Stack Overflow](https://stackoverflow.com/a/52613394/8401379)—solved the problem by adding the following section to `setup.cfg`:
+I finally—inspired by [this answer on Stack Overflow](https://stackoverflow.com/a/52613394/8401379)—solved the problem
+by adding the following section to `setup.cfg`:
 ```
 [bdist_wheel]
 python-tag = py39
 ```
 After this change, the file name of the resulting wheel file including the Python Tag string `py39` as I desired.
 
-### Considerations regarding the inter-word separate character in a multiword project name
+### Considerations regarding the inter-word delimiter character in a multiword project name
 The `name` field in `setup.cfg` (or `setup.py`) defines the name of your *project* as it will appear on PyPI. ([Examples
-will often misleadingly suggest](https://setuptools.pypa.io/en/latest/userguide/declarative_config.html) that this is the
-*package* name, in some incompletely specified notion of “package,” but the only effect of this field is to determine the
-*project* name on PyPI.)
+will often misleadingly suggest](https://setuptools.pypa.io/en/latest/userguide/declarative_config.html) that this is
+the *package* name, in some incompletely specified notion of “package,” but the only effect of this field is to
+determine the *project* name on PyPI.)
 
 When, for better readability, you want your project name to have multiple words, you need to have a nonspace delimiter
 between these words. However, no matter what delimiter you prefer, e.g., underscore (`_`), hyphen (`-`), or dot (`.`),
@@ -393,7 +405,8 @@ name your import package the same as the project, but substituting an underscore
 
 ### `__main__.py` is executed when package invoked from command line with `-m` flag; allows for a CLI
 Although not appropriate in all cases, including a `__main__.py` file establishes an entry point for the case where
-the package name is invoked directly from the command line with the `-m` flag, e.g.,:
+the package name is invoked directly (using [runpy](https://docs.python.org/3/library/runpy.html)) from the command line
+with the `-m` flag, e.g.,:
 ```
 python -m demo_package_and_read_data_files
 ```
@@ -401,9 +414,9 @@ python -m demo_package_and_read_data_files
 even though the project name uses hyphens for the delimiter.)
 
 (In general, the `-m` flag
-[tells Python to search `sys.path` for the named module and execute its contents as the `__main__` module](https://docs.python.org/3/using/cmdline.html#cmdoption-m). Since the argument is a module name, you must not give a file extension (.py). What’s crucial
-for us here is that package names (including namespace packages) are also permitted. When a package name is supplied
-instead of a normal module, the interpreter will execute `<pkg>.__main__` as the main module.)
+[tells Python to search `sys.path` for the named module and execute its contents as the `__main__` module](https://docs.python.org/3/using/cmdline.html#cmdoption-m). Since the argument is a module name, you must not give a file extension (.py). What’s
+crucial for us here is that package names (including namespace packages) are also permitted. When a package name is
+supplied instead of a normal module, the interpreter will execute `<pkg>.__main__` as the main module.)
 
 Thus the user can simply reference the package rather than a particular module within the package.
 
@@ -452,7 +465,8 @@ Here I walk through—stage by stage, and command by command—the process of:
 * testing your distribution by created a new virtual environment and installing your project from TestPyPI.
 
 
-A full transcript (where only some of the output is condensed) of this process is available at: [docs/Transcript_of_installation_and_testing.txt](https://github.com/jimratliff/python-demo-package-sample-data-with-code/blob/main/docs/Transcript_of_installation_and_testing.txt).
+A full transcript (where only some of the output is condensed) of this process is available at:
+[docs/Transcript_of_installation_and_testing.txt](https://github.com/jimratliff/python-demo-package-sample-data-with-code/blob/main/docs/Transcript_of_installation_and_testing.txt).
 
 ## Create a virtual environment
 From here on, I’m assuming that you’re using a virtual environment. I use
@@ -509,12 +523,13 @@ Installing in editable mode allows you to edit the code and immediately see the 
 reinstall the package.
 
 ## Build the distribution package to upload to PyPI
-When development matures to the point of having a version of the project you want to distribute via PyPI, the next step is
-to generate a [distribution package](https://packaging.python.org/en/latest/glossary/#term-Distribution-Package) for the
-project.
+When development matures to the point of having a version of the project you want to distribute via PyPI, the next step
+is to generate a [distribution package](https://packaging.python.org/en/latest/glossary/#term-Distribution-Package) for
+the project.
 
 ### Install `build`
-The first step is to install [`build`](https://pypa-build.readthedocs.io/en/stable/index.html) into your virtual environment (or upgrade if it already exists there) with
+The first step is to install [`build`](https://pypa-build.readthedocs.io/en/stable/index.html) into your virtual
+environment (or upgrade if it already exists there) with
 ```
 % python -m pip install --upgrade build
 ```
@@ -552,7 +567,8 @@ In the present case:
 * `py39`: (“Python Tag”) Iindicates that the package requires Python 3.9.
 * `none`: (“ABI Tag,” referring to
 [Application Binary Interface](https://en.wikipedia.org/wiki/Application_binary_interface)) Indicates which Python ABI
-is required by any included extension modules. `none` “[represent[s] the case of not caring. This is typically seen with py interpreter tags since you shouldn't care about what ABI an interpreter supports if you're targeting just the Python language and not a specific interpreter](https://snarky.ca/the-challenges-in-designing-a-library-for-pep-425/).”
+is required by any included extension modules. `none`
+“[represent[s] the case of not caring. This is typically seen with py interpreter tags since you shouldn't care about what ABI an interpreter supports if you're targeting just the Python language and not a specific interpreter](https://snarky.ca/the-challenges-in-designing-a-library-for-pep-425/).”
 * `any`: (“Platform Tag”) 
 #### The source archive
 The second of these, with the `tar.gz` extension, is a
