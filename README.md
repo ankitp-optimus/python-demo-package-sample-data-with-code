@@ -46,7 +46,7 @@ This isn’t a gratuitous attempt to confuse the reader but rather in the spirit
 “[Explicit is better than implicit.](https://peps.python.org/pep-0020/)” In practice, the project name and import
 package name are often chosen to be the same. It then is ambiguous in many discussion whether that common name is
 invoked in any particular case (a) because it is the project name or (b) because it is the import package name. My
-distinguishing the two is meant to help clarify what drives various behaviors. (See also #Considerations-regarding-the-inter-word-delimiter-character-in-a-multiword-project-name.)
+distinguishing the two is meant to help clarify what drives various behaviors. (See also § [Considerations regarding the inter-word delimiter character in a multiword project name](#considerations-regarding-the-inter-word-delimiter-character-in-a-multiword-project-name).)
 
 ## Resources for topics not well covered here
 I will not go into a detailed explanation of many aspects of packaging more generally that are well covered
