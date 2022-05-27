@@ -6,14 +6,15 @@ a text file in a subfolder "sample_data".
 import argparse
 from importlib.resources import files
 
+from yachalk import chalk
+
 from . import constants
 
 def main():
     print("I am here, in __main__.py.")
     print("\n" + 15*"# " + "\n")
 
-    # Checks for command line argument 
-    user_contribution = check_CLI_for_user_input()
+    # Checks for command line argument     user_contribution = check_CLI_for_user_input()
     if len(user_contribution) == 0:
         print("The user declined to share any knowledge. 🙁\n")
     else:
@@ -99,10 +100,17 @@ def read_text_from_resource(packagename, filename):
         data = constants.CLUELESS_STRING
         return data
     except FileNotFoundError as errormessage_FNF:
-        print(f"\nOops! The data file «{filename}» wasn’t found at this location:\n»» {resource_location_as_string}.")
-        print(errormessage_FNF)
+        error_print(f"\nOops! The data file «{filename}» wasn’t found at this location:\n»» {resource_location_as_string}.")
+        error_print(errormessage_FNF)
         data = constants.CLUELESS_STRING
         return data
     else:
         return data
+
+
+def error_print(error_message):
+    """
+    Prints supplied error message to console with special error-message formatting
+    """
+    print(chalk.red(error_message))
     
