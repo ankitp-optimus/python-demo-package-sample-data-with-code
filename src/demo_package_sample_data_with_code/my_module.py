@@ -14,7 +14,8 @@ def main():
     print("I am here, in __main__.py.")
     print("\n" + 15*"# " + "\n")
 
-    # Checks for command line argument     user_contribution = check_CLI_for_user_input()
+    # Checks for command line argument 
+    user_contribution = check_CLI_for_user_input()
     if len(user_contribution) == 0:
         print("The user declined to share any knowledge. 🙁\n")
     else:
