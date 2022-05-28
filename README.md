@@ -597,6 +597,13 @@ of “[Packaging Python Projects](https://packaging.python.org/en/latest/tutoria
 Packaging User Guide » Tutorials.
 ```
 % cd path/to/demo_package_and_read_data_files
+```
+
+If this is your first time building distribution files for this project, continue immediately with the next step.
+However, if you’ve already built distribution files for earlier versions of this project, you might already have a
+`dist` directory at `path/to/my-project/dist`. In that case, move any of those earlier distribution files out of that
+directory. Otherwise, later steps will cause you to re-upload them to TestPyPI/PyPI, which you don’t want.
+```
 % python -m build
 ```
 
@@ -606,6 +613,8 @@ following two files:
 demo_package_sample_data_with_code-0.0.1-py39-none-any.whl
 demo-package-sample-data-with-code-0.0.1.tar.gz
 ```
+(If you didn’t already, be sure to remove older versions of the distribution files from this directory. Otherwise, later
+steps will cause you to re-upload those obsolete files to TestPyPI/PyPI, which can cause an error.)
 #### The wheel file
 The first of these, with the `.whl` extension is a “wheel” file, or
 “[built distribution](https://packaging.python.org/en/latest/glossary/#term-Built-Distribution).” It contains files
@@ -633,8 +642,13 @@ The second of these, with the `tar.gz` extension, is a
 You should always upload a source archive and provide built archives for the platforms your project is compatible with.
 In this case, our example package is compatible with Python on any platform so only one built distribution is needed.
 
-## Upload the distribution
+## Upload the distribution and then install it from scratch to test it
 ### Install `twine`
+Twine ([project on PyPI](https://pypi.org/project/twine/), [docs](https://twine.readthedocs.io/en/stable/)) is a utility
+for publishing Python packages to PyPI and other repositories. Twine is the method adopted here to upload the
+built distribution files to both TestPyPI and PyPI. (See also [Uploading the distribution archives](https://packaging.python.org/en/latest/tutorials/packaging-projects/#uploading-the-distribution-archives) in the Python Packaging User Guide.)
+
+To install `twine`:
 ```
 % pip install --upgrade twine
 ```
@@ -644,7 +658,9 @@ In this case, our example package is compatible with Python on any platform so o
 Checking dist/demo_package_and_read_data_files-0.0.1-py39-none-any.whl: PASSED
 Checking dist/demo_package_and_read_data_files-0.0.1.tar.gz: PASSED
 ```
-### Test with test.pypi.org
+### Test your entire distribution work flow with TestPyPI
+[TestPyPI](https://test.pypi.org/) is a separate Python package index that allows you to “dry run” your packaging
+procedures to make sure everything works before uploading it to the main PyPI. See [Using TestPyPI](https://packaging.python.org/en/latest/guides/using-testpypi/) in the Python Packaging User Guide.
 #### Upload to test.pypi.org
 See “[Using TestPyPI](https://packaging.python.org/en/latest/guides/using-testpypi/#using-test-pypi),” of the Python
 Packaging User Guide, PyPA.
@@ -666,7 +682,7 @@ When visiting the above link, the page displays a command for installing the pac
 pip install -i https://test.pypi.org/simple/ demo-package-and-read-data-files==0.0.1
 ```
 
-##### Create a new directory and corresponding new virtual environment and install package from TestPyPI
+##### Create a new directory and corresponding new virtual environment
 
 ```
 % cd GitHub_repos 
@@ -674,24 +690,27 @@ pip install -i https://test.pypi.org/simple/ demo-package-and-read-data-files==0
 % python3 -m venv venv
 % source venv/bin/activate
 % python -m pip install --upgrade pip
-% pip install -i https://test.pypi.org/simple/ demo-package-and-read-data-files==0.0.1
-        …
-        …
-Successfully installed demo-package-and-read-data-files-0.0.1
-
-% python -m demo-package-and-read-data-files
-No module named demo-package-and-read-data-files
-% pip list
-Package                          Version
--------------------------------- -------
-demo-package-and-read-data-files 0.0.1
-pip                              22.0.4
-setuptools                       60.10.0
-
-
-
+```
+##### Install package from TestPyPI
+###### When there are no third-party dependencies that must be installed from PyPI
+When your project has no third-party dependencies (or all of the third-party are on TestPyPI, an unlikely occurrence
+because TestPyPI regularly prunes itself) 
 
 ```
+% pip install -i https://test.pypi.org/simple/ demo-package-and-read-data-files==0.0.1
+```
+###### When there *are* third-party dependencies that must be installed from PyPI
+When there are third-party dependencies that are not available on TestPyPI but are available on
+PyPI, you need to tell `pip` to also look on PyPI. (See “[Using TestPyPI](https://packaging.python.org/en/latest/guides/using-testpypi/#using-test-pypi),” of the Python
+Packaging User Guide, PyPA.)
+
+```
+pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ my-project
+```
+Note that here you aren’t disclosing which dependency to get where but rather: if `pip` can’t find a dependency on
+TestPyPI, `pip` should then look on PyPI.
+
+
 # Running the program from the command line
 ## Running the program with no CLI argument
 When the user does not supply a CLI argument, a default message is printed:
@@ -720,6 +739,15 @@ Meaning of life: I have no clue 🤪
 ```
 
 ## Running the program with CLI argument a sequence of words
+After installing, you can run the program from the command line with either of the following two syntaxes:
+```
+python -m demo_package_sample_data_with_code <OPTIONAL_ARGUMENT>
+```
+or
+```
+my-command <OPTIONAL_ARGUMENT>
+```
+
 The user is meant to enter text at the command line. If the user does not quote the string, it will be reported as a
 list of words, which will be `.join()`ed into a single string of space-separated words.
 ```
@@ -743,6 +771,7 @@ Meaning of life: I have no clue 🤪
 * * * * * * * * * * * * * * *
 ```
 ## Running the program with CLI argument a quoted string of a sequence of words
+
 ```
 python -m demo_package_sample_data_with_code "Wu Zetian was the only female emperor in China’s history"
 I am here, in __main__.py.
