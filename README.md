@@ -1,6 +1,6 @@
 # Introduction
 ## Goals of this project
-This package doesn’t do anything useful. It exists only as a vehicle to demonstrate:
+This project doesn’t do anything useful. It exists only as a vehicle to demonstrate:
 *  how to prepare a Python project that can be uploaded to the
 [Python Package Index (PyPI)](https://pypi.org/) as a release, from which it can then be installed on user systems using
 the [pip](https://pypi.org/project/pip/) package installer—using *static* metadata (`setup.cfg`) rather than dynamic
@@ -14,20 +14,36 @@ actually reside on the file system (e.g., if they reside in a .zip archive). Thi
 benefits
 * how to provide a single source for the version number, in this case by supplying a `__version__.py` file in the import
 module that is (a) imported by `__init__.py` and (b) referenced by `setup.cfg`
-*  how to install the project in “editable”/“development” mode during development so that you can test the
-functionalities that access resources in packages—without having to rebuild and reinstall the package after every change
+* how to specify third-party dependencies that are available on [PyPI](https://pypi.org/) so that `pip` will install
+them as well, if necessary, when `pip` installs  this project
 * how to tell the `build` mechanism to identify a specific version of Python, e.g., `py39`, in the “Python Tag” in
 the file name of the resulting “wheel” (`.whl`) distribution file, so that users will be better informed of the
 Python-version requirement before attempting to install the package
-* how to use a `__main__.py` file as an entry point to the package, which will execute when the *package* is invoked on
+* how to use a `__main__.py` file as an entry point, which will execute when the import package is invoked on
 the command line with the `-m` flag (e.g., `python -m my_package`)
 * how to define a console-script entry point, e.g., `my-command`, so that the user can simply and directly invoke
 `my-command` on the command line, rather than `python -m my_package`
-* how to provide for, and process, an optional argument on the command line.
+* how to provide for, and process, an optional argument on the command line
+* how to reference, from outside the package, modules, methods, function, etc. that are within the package, in order to, 
+for example, to test them
+*  how to install the project in “editable”/“development” mode during development so that you can test the
+functionalities that access resources in packages—without having to rebuild and reinstall the package after every change.
 
-## Python requirement; timeliness
+In addition to reading this README, it will probably be useful to complement this README with inspection of the files 
+themselves. You can examine the configurations and code directly for a given file by accessing it at  the
+[file list](https://github.com/jimratliff/python-demo-package-sample-data-with-code/find/main) for the
+[GitHub repository](https://github.com/jimratliff/python-demo-package-sample-data-with-code). You could also download or clone the repository and use it as a template for a new project.
+
+All citations/quotations to documentation and other sources were valid as of May 1, 2022.
+
+## Dependencies
 ***NOTE: This package requires Python 3.9+.*** This package has been tested only on Python 3.9.12, with pip 22.1.1,
-on a Mac (macOS 12.3.1). All citations/quotations to documentation and other sources were valid as of May 1, 2022.
+on a Mac (macOS 12.3.1). 
+
+This package also requires [yachalk](https://pypi.org/project/yachalk/). If you install this project (demo-package-sample-data-with-code) as explained later, `pip` should automatically install `yachalk` if it is not 
+already installed on your system. `yachalk` allows console output to be rendered in specified colors. Here, I use it to
+make error messages red. I incorporated `yachalk` into the code largely to provide an excuse to illustrate how to
+disclose in the metadata the existence of a third-party dependency that also may need to be installed by `pip`.
 
 ## Terminology
 For my use of “project” and “package” (including “import package” and “distribution package”) see Jim Ratliff,
@@ -203,12 +219,22 @@ This project has the following initial directory/file structure:
 │   │   ├── constants.py
 │   │   ├── my_module.py
 └── tests
+    └── test_my_module.py
 ```
 By “initial directory/file structure,” I acknowledge that additional directories will be generated as a result of
 (a) creating a virtual environment, which adds a `venv/` directory, (b) installing the project in an
 “editable”/“development” mode, which adds a `src/demo_package_sample_data_with_code.egg-info` directory, and
 (c) the `build` process, which adds a `dist/` directory. 
 
+### Key user-facing names
+| Name | Meaning |
+|------|---------|
+|demo-package-sample-data-with-code | The *project* name, as it appears on PyPI and in a `pip install` |
+|python-demo-package-sample-data-with-code | Name of [GitHub repository](https://github.com/jimratliff/python-demo-package-sample-data-with-code). Independent of any other name|
+|demo_package_sample_data_with_code | Name of the import package |
+|my_module.py | Name of the primary module of Python code|
+
+### The `src/` directory structure
 Note the presence of the `src/` directory at the root level of the project directory and which contains the import 
 package `demo_package_and_read_data_files`. This structure—the presence of this `src/` directory—is certainly not yet a
 standard but is gaining mindshare. I won’t attempt to justify it myself here, but instead I’ll point you to the
@@ -245,48 +271,6 @@ that).
     environment.”
 
 ## Noncomprehensive comments on selected elements of the project metadata and structure
-### Establishing a single source for the version number ###
-This project defines its version number consistent with a frequently expressed desideratum referred to as
-“[single-sourcing the package version](https://packaging.python.org/en/latest/guides/single-sourcing-package-version/)”.
-
-This requires coordination between three files: (a) `setup.cfg`, (b) `__init__.py`, and (c) `__version__.py`, as
-described below.
-
-For further discussion on this topic, see the answers to “[Set `__version__` of module from a file when configuring
-setuptools using `setup.cfg` without `setup.py`](https://stackoverflow.com/questions/72357031/set-version-of-module-from-a-file-when-configuring-setuptools-using-setup),” Stack Overflow, May 23, 2022.
-
-#### Specify the version number in the `__version__.py` file ####
-The version number is defined in the `__version__.py` file within the root of import package, i.e., at path:
-```
-/path/to/demo-package-sample-data-with-code/src/demo_package_sample_data_with_code/__version__.py
-```
-with the syntax:
-```
-__version__ = '1.0.0'
-```
-This must be coupled with both an `import` in the `__init__.py` file and the appropriate directive in the `setup.cfg`
-file.
-#### The `__init__.py` file must import the `__version__` attribute ####
-The `__init__.py` file, also within the root of the import package, i.e., at path:
-```
-/path/to/demo-package-sample-data-with-code/src/demo_package_sample_data_with_code/__init__.py
-```
-must include the following `import` command:
-```
-from . __version__ import __version__
-```
-This import statement is discussed in detail at https://stackoverflow.com/a/72357032/8401379
-#### The `setup.cfg` file’s `version` declaration  must be properly defined to use the `attr:` special directive
-The `setup.cfg` file, in the root of the project directory, i.e., at the path
-```
-/path/to/demo-package-sample-data-with-code/setup.cfg
-```
-must include the following snippet:
-```
-[metadata]
-  …
-version = attr: demo_package_sample_data_with_code.__version__
-```
 ### The directory that immediately encloses each resource must be a package and thus must have an `__init__.py` file
 `importlib.resources` considers a file a resource only if the file is in the root directory of a package. A directory
 cannot be a package unless it includes a `__init__.py` file. (It’s fine if this `__init__.py` file is empty. It’s its
@@ -350,8 +334,56 @@ graft src
 which would ensure that all files within `src/` are included in the distribution.
 (See [Ionel Cristian Mărieș](https://blog.ionelmc.ro/2014/05/25/python-packaging/#the-structure): “Without `src`
 writting a `MANIFEST.in` is tricky. … It’s much easier with a `src` directory: just add `graft src` in `MANIFEST.in`.)
+### Establishing a single source for the version number ###
+This project defines its version number consistent with a frequently expressed desideratum referred to as
+“[single-sourcing the package version](https://packaging.python.org/en/latest/guides/single-sourcing-package-version/)”.
 
+This requires coordination between three files: (a) `setup.cfg`, (b) `__init__.py`, and (c) `__version__.py`, as
+described below.
 
+For further discussion on this topic, see the answers to “[Set `__version__` of module from a file when configuring
+setuptools using `setup.cfg` without `setup.py`](https://stackoverflow.com/questions/72357031/set-version-of-module-from-a-file-when-configuring-setuptools-using-setup),” Stack Overflow, May 23, 2022.
+
+#### Specify the version number in the `__version__.py` file ####
+The version number is defined in the `__version__.py` file within the root of import package, i.e., at path:
+```
+/path/to/demo-package-sample-data-with-code/src/demo_package_sample_data_with_code/__version__.py
+```
+with the syntax:
+```
+__version__ = '1.0.0'
+```
+This must be coupled with both an `import` in the `__init__.py` file and the appropriate directive in the `setup.cfg`
+file.
+#### The `__init__.py` file must import the `__version__` attribute ####
+The `__init__.py` file, also within the root of the import package, i.e., at path:
+```
+/path/to/demo-package-sample-data-with-code/src/demo_package_sample_data_with_code/__init__.py
+```
+must include the following `import` command:
+```
+from . __version__ import __version__
+```
+This import statement is discussed in detail at https://stackoverflow.com/a/72357032/8401379
+#### The `setup.cfg` file’s `version` declaration  must be properly defined to use the `attr:` special directive
+The `setup.cfg` file, in the root of the project directory, i.e., at the path
+```
+/path/to/demo-package-sample-data-with-code/setup.cfg
+```
+must include the following snippet:
+```
+[metadata]
+  …
+version = attr: demo_package_sample_data_with_code.__version__
+```
+### Disclose any third-party dependencies that are available on PyPI so that they will also be installed if needed
+In the `[options]` section of `setup.cfg`, I disclose the dependency on `yachalk` with the following snippet:
+```
+install_requires = 
+    yachalk
+```
+See “[Configuring setuptools using setup.cfg files](https://setuptools.pypa.io/en/stable/userguide/declarative_config.html)”
+of the SetupTools User Guide for more detail.
 ### `setup.cfg`: Add a `python-tag` tag to force file name of resulting “wheel” distribution file to reflect partticular minimum version of Python
 This discussion will make more sense after you get to the later section § “[The wheel file](#the-wheel-file),” but this
 discussion nevertheless logically belongs here.
@@ -456,6 +488,30 @@ console_scripts =
 from . __main__ import main
 ```
 
+## Allow for the user to optionally enter an argument on the command line
+As an illustration of the functionality, the code uses the built-in
+[argparse](https://docs.python.org/3/library/argparse.html) module allows the user to (optionally) enter an argument on
+the command line on the same line as the command to run the program. (Also see Tshepang Lekhonkhobe’s
+[excellent `argparse` tutorial](https://docs.python.org/3/howto/argparse.html).)
+
+You can see how this functionality is implemented in this project in the `check_CLI_for_user_input()` function, which is
+called from `main()`, both in `my_module.py`.
+
+## Accessing the package’s modules, functions, etc. from outside the package
+In the file and directory structure diagram above, you’ll see in the root of the project directory the module
+`tests/test_my_module.py`. This is outside the scope of the code that will be installed by `pip`, which is limited to
+the `src/` directory. The `tests` directory is in the standard location for the “`src`” directory/file structure that 
+is adopted here (though there is also a popular train of thought that tests should be distributed within the source
+directory). (See, e.g., “[Where to Put Tests?](http://pythonchb.github.io/PythonTopics/where_to_put_tests.html)”: “In Python packaging, there is no consensus on where you should put your
+test suite.”)
+
+The module `test_my_module.py` is included to illustrate how a module in this location outside of the installed 
+package can reference entities within the installed package. This can be seen in the two `import` statements in
+`test_my_module.py`:
+```
+from demo_package_sample_data_with_code.my_module import print_value_from_resource
+import demo_package_sample_data_with_code.constants as source
+```
 # Finish development and upload to PyPI
 Here I walk through—stage by stage, and command by command—the process of:
 * creating a virtual environment,
