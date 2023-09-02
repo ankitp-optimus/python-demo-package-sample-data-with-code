@@ -383,7 +383,7 @@ install_requires =
 ```
 See “[Configuring setuptools using setup.cfg files](https://setuptools.pypa.io/en/stable/userguide/declarative_config.html)”
 of the SetupTools User Guide for more detail.
-### `setup.cfg`: Add a `python-tag` tag to force file name of resulting “wheel” distribution file to reflect partticular minimum version of Python
+### `setup.cfg`: Add a `python-tag` tag to force file name of resulting “wheel” distribution file to reflect particular minimum version of Python
 This discussion will make more sense after you get to the later section § “[The wheel file](#the-wheel-file),” but this
 discussion nevertheless logically belongs here.
 
