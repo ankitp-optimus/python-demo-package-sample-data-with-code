@@ -489,7 +489,7 @@ from . __main__ import main
 
 ## Allow for the user to optionally enter an argument on the command line
 As an illustration of the functionality, the code uses the built-in
-[argparse](https://docs.python.org/3/library/argparse.html) module allows the user to (optionally) enter an argument on
+[argparse](https://docs.python.org/3/library/argparse.html) module, which allows the user to (optionally) enter an argument on
 the command line on the same line as the command to run the program. (Also see Tshepang Lekhonkhobe’s
 [excellent `argparse` tutorial](https://docs.python.org/3/howto/argparse.html).)
 
