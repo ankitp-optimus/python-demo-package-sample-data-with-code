@@ -255,8 +255,7 @@ PYTHONPATH=. to fire up the Python REPL and play with your package (you will nee
 that).
 
 * § “[The structure](https://blog.ionelmc.ro/2014/05/25/python-packaging/#the-structure)” in Ionel Cristian Mărieș,
-“[Packaging a python library](https://blog.ionelmc.ro/2014/05/25/python-packaging),” ionel’s codelog, September 30,
-2019.
+“[Packaging a python library](https://blog.ionelmc.ro/2014/05/25/python-packaging),” ionel’s codelog, September 30, 2019.
     * E.g., the `src/` structure (a) ensures that you test your code from the same working directory that your users
     will see when they install your package, (b) allows simpler packaging code and a simpler `MANIFEST.in`, and
     (c) results in a much cleaner editable install.
